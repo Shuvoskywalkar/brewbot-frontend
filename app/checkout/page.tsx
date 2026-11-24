@@ -4,7 +4,7 @@ import Image from "next/image"
 import Link from "next/link"
 import { Suspense, useEffect, useState } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
-import { ArrowLeft, Check, Clock3, Minus, Phone, Plus, WalletCards } from "lucide-react"
+import { ArrowLeft, Clock3, Coffee, Minus, Phone, Plus, WalletCards } from "lucide-react"
 
 const products = [
   { id: "masala-tea", name: "Masala Raw Tea", price: 10, image: "/tea-cup.png" },
@@ -18,8 +18,6 @@ function CheckoutScreen() {
   const selectedId = products.some((product) => product.id === searchParams.get("product")) ? searchParams.get("product")! : "masala-tea"
   const [seconds, setSeconds] = useState(45)
   const [quantity, setQuantity] = useState(1)
-  const [promo, setPromo] = useState("")
-  const [promoApplied, setPromoApplied] = useState(false)
   const [message, setMessage] = useState("")
   const [rfidOpen, setRfidOpen] = useState(false)
   const selected = products.find((product) => product.id === selectedId)!
@@ -45,7 +43,7 @@ function CheckoutScreen() {
     <main className="checkout-compact-page">
       <header className="checkout-compact-header">
         <Link href="/" aria-label="Back to products"><ArrowLeft size={20} /></Link>
-        <h1>Checkout</h1>
+        <h1 className="checkout-brand"><Coffee size={22} aria-hidden="true" /> BrewBot</h1>
         <span className="checkout-countdown" role="timer" aria-label={`${seconds} seconds remaining`}><Clock3 size={16} /> {seconds}s</span>
       </header>
       <div className="checkout-compact-content">
@@ -61,23 +59,10 @@ function CheckoutScreen() {
             </div>
           </div>
         </section>
-        <section className="checkout-compact-summary">
-          <h2>Order Summary</h2>
-          <div className="checkout-promo">
-            <input aria-label="Promo code" placeholder="Have a promo code?" value={promo} onChange={(event) => setPromo(event.target.value)} />
-            <button onClick={() => { if (promo.trim()) { setPromoApplied(true); setMessage("Code: applied!") } }}>Apply</button>
-          </div>
-          {promoApplied && <p className="checkout-promo-success"><Check size={14} />{message}<button onClick={() => { setPromoApplied(false); setPromo("") }} aria-label="Remove promo code">×</button></p>}
-          <div className="checkout-totals">
-            <p><span>Subtotal</span><b>{subtotal} Tk</b></p>
-            <p><span>Discount</span><b className="checkout-discount">− 0 Tk</b></p>
-          </div>
-          <div className="checkout-grand-total"><strong>Total Amount</strong><b>{subtotal} Tk</b></div>
-        </section>
         <div className="checkout-payment-actions">
           <button className="checkout-rfid-button" onClick={() => setRfidOpen(true)}><WalletCards size={20} /> Pay with RFID Card</button>
           <button className="checkout-pay-button" onClick={() => setMessage("Payment gateway will be connected in the backend phase.")}>Pay Now</button>
-          {message && !promoApplied && <p role="status" className="checkout-message">{message}</p>}
+          {message && <p role="status" className="checkout-message">{message}</p>}
         </div>
       </div>
       {rfidOpen && (
