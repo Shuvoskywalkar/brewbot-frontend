@@ -481,7 +481,11 @@ a { color: inherit; text-decoration: none; }
 /* Compact, phone-first customer kiosk */
 .kiosk-screen { position: relative; width: 100%; max-width: 720px; min-height: 100svh; margin: 0 auto; padding: 10px 10px 58px; overflow-x: hidden; background: #f0f1f5; color: #303541; }
 .kiosk-location { position: relative; min-height: 104px; margin-bottom: 10px; padding: 13px 14px; border-radius: 10px; background: #34383e; color: #fff; box-shadow: 0 5px 9px #24283120; }
-.kiosk-brand { position: absolute; top: 12px; right: 14px; color: #c6c8cb; font-size: 10px; font-weight: 700; letter-spacing: .4px; }
+.kiosk-brand { position: absolute; top: 10px; right: 12px; display: inline-flex; align-items: center; gap: 5px; color: #e2e9e5; }
+.kiosk-brand-mark { width: 23px; height: 23px; fill: none; stroke: #a8c7b5; stroke-linecap: round; stroke-linejoin: round; stroke-width: 1.4; }
+.kiosk-brand-eye { fill: #a8c7b5; stroke: none; }
+.kiosk-brand-word { font-size: 12px; font-weight: 700; letter-spacing: -.45px; }
+.kiosk-brand-word span { color: #a8c7b5; font-weight: 500; }
 .kiosk-location-title { display: flex; align-items: center; gap: 10px; }
 .kiosk-building-icon { width: 26px; height: 30px; color: #fff; stroke-width: 2.5; }
 .kiosk-location-title h1 { margin: 0; font-size: 20px; line-height: 1.15; letter-spacing: -.5px; }
