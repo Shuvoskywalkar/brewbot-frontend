@@ -17,6 +17,7 @@ export function DeviceStorefront({ deviceId = "APD260209001" }: { deviceId?: str
   return (
     <main className="kiosk-screen">
       <section className="kiosk-location" aria-label="Device location">
+        <span className="kiosk-brand">BrewBot</span>
         <div className="kiosk-location-title"><Building2 className="kiosk-building-icon" aria-hidden="true"/><h1>Dhaka University</h1></div>
         <p className="kiosk-hall"><MapPin size={17} fill="currentColor"/> Jagannath Hall</p>
         <p className="kiosk-last-stock">Last Stock: 24 Nov, 09:45 PM</p>

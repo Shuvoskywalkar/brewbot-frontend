@@ -4,7 +4,7 @@ import Image from "next/image"
 import Link from "next/link"
 import { Suspense, useEffect, useState } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
-import { ArrowLeft, Clock3, Coffee, Minus, Phone, Plus, WalletCards } from "lucide-react"
+import { ArrowLeft, Clock3, Phone, WalletCards } from "lucide-react"
 
 const products = [
   { id: "masala-tea", name: "Masala Raw Tea", price: 10, image: "/tea-cup.png" },
@@ -17,11 +17,9 @@ function CheckoutScreen() {
   const searchParams = useSearchParams()
   const selectedId = products.some((product) => product.id === searchParams.get("product")) ? searchParams.get("product")! : "masala-tea"
   const [seconds, setSeconds] = useState(45)
-  const [quantity, setQuantity] = useState(1)
   const [message, setMessage] = useState("")
   const [rfidOpen, setRfidOpen] = useState(false)
   const selected = products.find((product) => product.id === selectedId)!
-  const subtotal = selected.price * quantity
 
   useEffect(() => {
     const timerId = window.setInterval(() => {
@@ -43,21 +41,14 @@ function CheckoutScreen() {
     <main className="checkout-compact-page">
       <header className="checkout-compact-header">
         <Link href="/" aria-label="Back to products"><ArrowLeft size={20} /></Link>
-        <h1 className="checkout-brand"><Coffee size={22} aria-hidden="true" /> BrewBot</h1>
+        <h1>Checkout</h1>
         <span className="checkout-countdown" role="timer" aria-label={`${seconds} seconds remaining`}><Clock3 size={16} /> {seconds}s</span>
       </header>
       <div className="checkout-compact-content">
         <section className="checkout-product-card">
           <Image src={selected.image} alt={selected.name} width={76} height={76} />
           <div className="checkout-product-copy"><h2>{selected.name}</h2><p>{selected.price}.00 Tk</p></div>
-          <div className="checkout-product-controls">
-            <strong>{selected.price * quantity} Tk</strong>
-            <div className="checkout-quantity">
-              <button onClick={() => setQuantity((value) => Math.max(1, value - 1))} aria-label="Decrease quantity"><Minus size={14} /></button>
-              <b>{quantity}</b>
-              <button onClick={() => setQuantity((value) => value + 1)} aria-label="Increase quantity"><Plus size={14} /></button>
-            </div>
-          </div>
+          <strong className="checkout-product-price">{selected.price} Tk</strong>
         </section>
         <div className="checkout-payment-actions">
           <button className="checkout-rfid-button" onClick={() => setRfidOpen(true)}><WalletCards size={20} /> Pay with RFID Card</button>
