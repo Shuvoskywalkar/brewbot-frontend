@@ -1,12 +1,10 @@
 "use client"
 
-import { FormEvent, useState } from "react"
-import { ArrowLeft } from "lucide-react"
+import { useState } from "react"
 
-type EPSCheckoutFormProps = {
+type CheckoutPaymentButtonProps = {
   productId: string
   deviceId: string | null
-  onBack: () => void
 }
 
 type InitializeResponse = {
@@ -14,16 +12,13 @@ type InitializeResponse = {
   error?: string
 }
 
-export function EPSCheckoutForm({ productId, deviceId, onBack }: EPSCheckoutFormProps) {
+export function CheckoutPaymentButton({ productId, deviceId }: CheckoutPaymentButtonProps) {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [message, setMessage] = useState("")
 
-  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault()
+  async function startPayment() {
     if (isSubmitting) return
 
-    const form = event.currentTarget
-    const formData = new FormData(form)
     setIsSubmitting(true)
     setMessage("")
 
@@ -31,22 +26,12 @@ export function EPSCheckoutForm({ productId, deviceId, onBack }: EPSCheckoutForm
       const response = await fetch("/api/payments/eps/initialize", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          productId,
-          deviceId,
-          customerName: formData.get("customerName"),
-          customerEmail: formData.get("customerEmail"),
-          customerPhone: formData.get("customerPhone"),
-          customerAddress: formData.get("customerAddress"),
-          customerCity: formData.get("customerCity"),
-          customerState: formData.get("customerState"),
-          customerPostcode: formData.get("customerPostcode"),
-        }),
+        body: JSON.stringify({ productId, deviceId }),
       })
       const result = await response.json() as InitializeResponse
 
       if (!response.ok || !result.redirectUrl) {
-        setMessage(result.error ?? "We couldn't start the EPS payment. Please try again.")
+        setMessage(result.error ?? "We couldn't open the payment gateway. Please try again.")
         setIsSubmitting(false)
         return
       }
@@ -59,53 +44,11 @@ export function EPSCheckoutForm({ productId, deviceId, onBack }: EPSCheckoutForm
   }
 
   return (
-    <form className="eps-checkout-form" onSubmit={handleSubmit}>
-      <section className="eps-customer-card" aria-labelledby="eps-details-title">
-        <div className="eps-details-heading">
-          <h2 id="eps-details-title">Payment details</h2>
-          <p>Required by EPS to start your payment.</p>
-        </div>
-        <div className="eps-fields">
-          <label className="eps-field">
-            <span>Full name</span>
-            <input name="customerName" autoComplete="name" maxLength={100} required />
-          </label>
-          <label className="eps-field">
-            <span>Email address</span>
-            <input name="customerEmail" type="email" autoComplete="email" maxLength={254} required />
-          </label>
-          <label className="eps-field">
-            <span>Bangladesh mobile number</span>
-            <input name="customerPhone" type="tel" inputMode="tel" autoComplete="tel" placeholder="01XXXXXXXXX" maxLength={24} required />
-          </label>
-          <label className="eps-field">
-            <span>Street address</span>
-            <input name="customerAddress" autoComplete="street-address" maxLength={200} required />
-          </label>
-          <label className="eps-field">
-            <span>City</span>
-            <input name="customerCity" autoComplete="address-level2" maxLength={100} required />
-          </label>
-          <label className="eps-field">
-            <span>District / state</span>
-            <input name="customerState" autoComplete="address-level1" maxLength={100} required />
-          </label>
-          <label className="eps-field">
-            <span>Postal code</span>
-            <input name="customerPostcode" autoComplete="postal-code" maxLength={20} required />
-          </label>
-        </div>
-        <p className="eps-privacy-note">Your billing details are sent to EPS and are not stored by BrewBot.</p>
-      </section>
-      <footer className="checkout-payment-actions checkout-eps-actions">
-        <button className="checkout-back-button" type="button" onClick={onBack} disabled={isSubmitting}>
-          <ArrowLeft size={18} aria-hidden="true" /> Back to payment options
-        </button>
-        <button className="checkout-pay-button" type="submit" disabled={isSubmitting} aria-busy={isSubmitting}>
-          {isSubmitting ? "Connecting to EPS…" : "Continue to EPS"}
-        </button>
-        {message && <p role="alert" className="checkout-message">{message}</p>}
-      </footer>
-    </form>
+    <div className="checkout-payment-button-wrap">
+      <button className="checkout-pay-button" type="button" onClick={startPayment} disabled={isSubmitting} aria-busy={isSubmitting}>
+        {isSubmitting ? "Opening secure payment…" : "Pay Now"}
+      </button>
+      {message && <p role="alert" className="checkout-message">{message}</p>}
+    </div>
   )
 }

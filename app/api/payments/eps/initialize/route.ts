@@ -12,18 +12,6 @@ function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value)
 }
 
-function readText(input: Record<string, unknown>, key: string, maxLength: number) {
-  const value = input[key]
-  return typeof value === "string" ? value.trim().slice(0, maxLength) : ""
-}
-
-function normalizeBangladeshPhone(value: string) {
-  const digits = value.replace(/\D/g, "")
-  if (/^01[3-9]\d{8}$/.test(digits)) return digits
-  if (/^8801[3-9]\d{8}$/.test(digits)) return `0${digits.slice(3)}`
-  return null
-}
-
 function createMerchantTransactionId() {
   return `${Date.now()}${randomInt(0, 1_000_000_000).toString().padStart(9, "0")}`
 }
@@ -46,27 +34,13 @@ export async function POST(request: NextRequest) {
   }
 
   const product = getBrewbotProduct(body.productId)
-  const customerName = readText(body, "customerName", 100)
-  const customerEmail = readText(body, "customerEmail", 254).toLowerCase()
-  const customerPhone = normalizeBangladeshPhone(readText(body, "customerPhone", 32))
-  const customerAddress = readText(body, "customerAddress", 200)
-  const customerCity = readText(body, "customerCity", 100)
-  const customerState = readText(body, "customerState", 100)
-  const customerPostcode = readText(body, "customerPostcode", 20)
   const deviceId = body.deviceId === null || body.deviceId === "" ? null : body.deviceId
 
   if (
     !product ||
-    (deviceId !== null && (typeof deviceId !== "string" || !/^[A-Z0-9_-]{1,64}$/.test(deviceId))) ||
-    customerName.length < 2 ||
-    !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(customerEmail) ||
-    !customerPhone ||
-    customerAddress.length < 3 ||
-    customerCity.length < 2 ||
-    customerState.length < 2 ||
-    customerPostcode.length < 2
+    (deviceId !== null && (typeof deviceId !== "string" || !/^[A-Z0-9_-]{1,64}$/.test(deviceId)))
   ) {
-    return NextResponse.json({ error: "Please complete all required payment details with valid information." }, { status: 400 })
+    return NextResponse.json({ error: "This checkout could not be started. Please return to the menu and try again." }, { status: 400 })
   }
 
   let merchantTransactionId: string
@@ -89,7 +63,7 @@ export async function POST(request: NextRequest) {
     })
   } catch {
     return NextResponse.json(
-      { error: "Payment storage is not ready. Apply the included SQL migration before testing EPS checkout." },
+      { error: "Checkout is temporarily unavailable. Please try again shortly." },
       { status: 503 },
     )
   }
@@ -110,13 +84,13 @@ export async function POST(request: NextRequest) {
       successUrl: successUrl.toString(),
       failUrl: failUrl.toString(),
       cancelUrl: cancelUrl.toString(),
-      customerName,
-      customerEmail,
-      customerPhone,
-      customerAddress,
-      customerCity,
-      customerState,
-      customerPostcode,
+      customerName: "",
+      customerEmail: "",
+      customerPhone: "",
+      customerAddress: "",
+      customerCity: "",
+      customerState: "",
+      customerPostcode: "",
       productName: product.name,
     })
 
@@ -131,8 +105,8 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(
       {
         error: isConfigurationError
-          ? "EPS sandbox credentials are missing. Add them in project Vars to enable payments."
-          : "EPS could not start this payment. Please try again.",
+          ? "Online payments are not configured yet. Please contact the administrator."
+          : "We couldn't open the payment gateway. Please try again.",
       },
       { status: isConfigurationError ? 503 : 502 },
     )

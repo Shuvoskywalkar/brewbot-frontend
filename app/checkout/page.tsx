@@ -5,7 +5,7 @@ import Link from "next/link"
 import { Suspense, useEffect, useState } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { ArrowLeft, Clock3, Phone, WalletCards } from "lucide-react"
-import { EPSCheckoutForm } from "@/components/eps-checkout-form"
+import { CheckoutPaymentButton } from "@/components/eps-checkout-form"
 import { brewbotProducts, getBrewbotProduct } from "@/lib/products"
 
 function CheckoutScreen() {
@@ -19,7 +19,6 @@ function CheckoutScreen() {
     : null
   const deviceHomePath = validDeviceId ? `/${encodeURIComponent(validDeviceId)}` : "/"
   const [seconds, setSeconds] = useState(45)
-  const [epsOpen, setEpsOpen] = useState(false)
   const [rfidOpen, setRfidOpen] = useState(false)
 
   useEffect(() => {
@@ -62,22 +61,12 @@ function CheckoutScreen() {
           <strong>Total Amount</strong>
           <b>{(selected.pricePaisa / 100).toLocaleString("en-BD", { maximumFractionDigits: 2 })} Tk</b>
         </section>
-        {epsOpen ? (
-          <EPSCheckoutForm
-            productId={selected.id}
-            deviceId={validDeviceId}
-            onBack={() => setEpsOpen(false)}
-          />
-        ) : (
-          <footer className="checkout-payment-actions">
-            <button className="checkout-rfid-button" type="button" onClick={() => setRfidOpen(true)}>
-              <WalletCards size={18} aria-hidden="true" /> Pay with RFID Card
-            </button>
-            <button className="checkout-pay-button" type="button" onClick={() => setEpsOpen(true)}>
-              Pay Now
-            </button>
-          </footer>
-        )}
+        <footer className="checkout-payment-actions">
+          <button className="checkout-rfid-button" type="button" onClick={() => setRfidOpen(true)}>
+            <WalletCards size={18} aria-hidden="true" /> Pay with RFID Card
+          </button>
+          <CheckoutPaymentButton productId={selected.id} deviceId={validDeviceId} />
+        </footer>
       </div>
       {rfidOpen && (
         <div className="kiosk-overlay" role="presentation" onClick={() => setRfidOpen(false)}>

@@ -47,11 +47,11 @@ export default async function CheckoutResultPage({
         ? "Payment not completed"
         : "Payment status unavailable"
   const message = attempt?.status === "paid"
-    ? "EPS verified your payment. Keep this screen as your confirmation."
+    ? "Your payment is confirmed. Keep this screen as your confirmation."
     : attempt?.status === "pending"
-      ? "EPS has not confirmed this transaction yet. Please wait before starting another payment."
+      ? "Your payment is still being confirmed. Please wait before starting another payment."
       : attempt
-        ? "EPS did not confirm this payment. You can return to the menu and try again."
+        ? "Your payment was not completed. You can return to the menu and try again."
         : storageReady
           ? "We could not find a verified payment for this reference."
           : "Payment confirmation is temporarily unavailable. Please check again shortly."
