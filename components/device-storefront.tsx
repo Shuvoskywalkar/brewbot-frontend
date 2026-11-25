@@ -3,6 +3,7 @@
 import Image from "next/image"
 import { useRouter } from "next/navigation"
 import { Building2, MapPin } from "lucide-react"
+import { BrewBotLogo } from "@/components/brewbot-logo"
 
 const products = [
   { id: "coffee", name: "Coffee", price: 20, stock: 42, image: "/coffee-cup.png" },
@@ -23,16 +24,7 @@ export function DeviceStorefront({ deviceId, universityName, locationName }: Dev
   return (
     <main className="kiosk-screen">
       <section className="kiosk-location" aria-label="Device location">
-        <span className="kiosk-brand" aria-label="BrewBot">
-          <svg className="kiosk-brand-mark" viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M6 9h11v7a5 5 0 0 1-5 5h-1a5 5 0 0 1-5-5V9Z" />
-            <path d="M17 11h1.5a2.5 2.5 0 0 1 0 5H17M11.5 5v3" />
-            <circle cx="11.5" cy="4" r="1.5" />
-            <circle className="kiosk-brand-eye" cx="10" cy="13" r=".7" />
-            <circle className="kiosk-brand-eye" cx="14" cy="13" r=".7" />
-          </svg>
-          <span className="kiosk-brand-word">Brew<span>Bot</span></span>
-        </span>
+        <BrewBotLogo className="kiosk-brand" />
         <div className="kiosk-location-title"><Building2 className="kiosk-building-icon" aria-hidden="true"/><h1>{universityName}</h1></div>
         <p className="kiosk-hall"><MapPin size={17} fill="currentColor"/> {locationName}</p>
         <p className="kiosk-last-stock">Last Stock: 24 Nov, 09:45 PM</p>
