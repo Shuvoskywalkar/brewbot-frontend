@@ -1,0 +1,64 @@
+import { and, eq, ne } from "drizzle-orm"
+import { NextRequest, NextResponse } from "next/server"
+import { db } from "@/lib/db"
+import { paymentAttempts } from "@/lib/db/schema"
+import { verifyEPSTransaction } from "@/lib/payments/eps"
+
+export const runtime = "nodejs"
+
+function resultRedirect(request: NextRequest, resultToken?: string) {
+  const url = new URL("/checkout/result", request.url)
+  if (resultToken) url.searchParams.set("ref", resultToken)
+  return NextResponse.redirect(url)
+}
+
+export async function GET(request: NextRequest) {
+  const search = request.nextUrl.searchParams
+  const merchantTransactionId = search.get("merchantTransactionId") ?? search.get("MerchantTransactionId")
+
+  if (!merchantTransactionId || !/^\d{10,30}$/.test(merchantTransactionId)) {
+    return resultRedirect(request)
+  }
+
+  try {
+    const [attempt] = await db.select().from(paymentAttempts)
+      .where(eq(paymentAttempts.merchantTransactionId, merchantTransactionId))
+      .limit(1)
+
+    if (!attempt) return resultRedirect(request)
+    if (attempt.status === "paid") return resultRedirect(request, attempt.resultToken)
+
+    let verification
+    try {
+      verification = await verifyEPSTransaction(merchantTransactionId)
+    } catch {
+      return resultRedirect(request, attempt.resultToken)
+    }
+
+    const idMatches = verification.merchantTransactionId === merchantTransactionId
+    const amountMatches = verification.amountPaisa === attempt.amountPaisa
+    const verifiedStatus = idMatches && amountMatches && verification.status === "success"
+      ? "paid"
+      : verification.status === "pending"
+        ? "pending"
+        : verification.status === "cancelled" || verification.status === "canceled"
+          ? "cancelled"
+          : "failed"
+
+    await db.update(paymentAttempts)
+      .set({
+        status: verifiedStatus,
+        epsTransactionId: verification.epsTransactionId,
+        updatedAt: new Date(),
+        paidAt: verifiedStatus === "paid" ? new Date() : null,
+      })
+      .where(and(
+        eq(paymentAttempts.merchantTransactionId, merchantTransactionId),
+        ne(paymentAttempts.status, "paid"),
+      ))
+
+    return resultRedirect(request, attempt.resultToken)
+  } catch {
+    return resultRedirect(request)
+  }
+}

@@ -3,8 +3,8 @@ import type { Metadata, Viewport } from 'next'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'Dhaka University | Campus kiosk',
-  description: 'Choose a drink at the Dhaka University campus kiosk.',
+  title: 'BrewBot | Campus kiosk',
+  description: 'Open a BrewBot device QR link to view its location-specific drink menu.',
   generator: 'v0.app',
   icons: {
     icon: [

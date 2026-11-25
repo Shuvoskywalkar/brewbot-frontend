@@ -1,105 +1,14 @@
-"use client"
+import { CheckoutScreen } from "@/components/checkout-screen"
+import { getBrewbotProduct } from "@/lib/products"
 
-import Image from "next/image"
-import Link from "next/link"
-import { Suspense, useEffect, useState } from "react"
-import { useRouter, useSearchParams } from "next/navigation"
-import { ArrowLeft, Check, Clock3, Minus, Phone, Plus, WalletCards } from "lucide-react"
-
-const products = [
-  { id: "masala-tea", name: "Masala Raw Tea", price: 10, image: "/tea-cup.png" },
-  { id: "milk-tea", name: "Milk Tea", price: 15, image: "/milk-tea-cup.png" },
-  { id: "coffee", name: "Coffee", price: 20, image: "/coffee-cup.png" },
-]
-
-function CheckoutScreen() {
-  const router = useRouter()
-  const searchParams = useSearchParams()
-  const selectedId = products.some((product) => product.id === searchParams.get("product")) ? searchParams.get("product")! : "masala-tea"
-  const [seconds, setSeconds] = useState(45)
-  const [quantity, setQuantity] = useState(1)
-  const [promo, setPromo] = useState("")
-  const [promoApplied, setPromoApplied] = useState(false)
-  const [message, setMessage] = useState("")
-  const [rfidOpen, setRfidOpen] = useState(false)
-  const selected = products.find((product) => product.id === selectedId)!
-  const subtotal = selected.price * quantity
-
-  useEffect(() => {
-    const timerId = window.setInterval(() => {
-      setSeconds((remaining) => {
-        if (remaining <= 1) {
-          window.clearInterval(timerId)
-          router.replace("/")
-          return 0
-        }
-
-        return remaining - 1
-      })
-    }, 1000)
-
-    return () => window.clearInterval(timerId)
-  }, [router])
-
-  return (
-    <main className="checkout-compact-page">
-      <header className="checkout-compact-header">
-        <Link href="/" aria-label="Back to products"><ArrowLeft size={20} /></Link>
-        <h1>Checkout</h1>
-        <span className="checkout-countdown" role="timer" aria-label={`${seconds} seconds remaining`}><Clock3 size={16} /> {seconds}s</span>
-      </header>
-      <div className="checkout-compact-content">
-        <section className="checkout-product-card">
-          <Image src={selected.image} alt={selected.name} width={76} height={76} />
-          <div className="checkout-product-copy"><h2>{selected.name}</h2><p>{selected.price}.00 Tk</p></div>
-          <div className="checkout-product-controls">
-            <strong>{selected.price * quantity} Tk</strong>
-            <div className="checkout-quantity">
-              <button onClick={() => setQuantity((value) => Math.max(1, value - 1))} aria-label="Decrease quantity"><Minus size={14} /></button>
-              <b>{quantity}</b>
-              <button onClick={() => setQuantity((value) => value + 1)} aria-label="Increase quantity"><Plus size={14} /></button>
-            </div>
-          </div>
-        </section>
-        <section className="checkout-compact-summary">
-          <h2>Order Summary</h2>
-          <div className="checkout-promo">
-            <input aria-label="Promo code" placeholder="Have a promo code?" value={promo} onChange={(event) => setPromo(event.target.value)} />
-            <button onClick={() => { if (promo.trim()) { setPromoApplied(true); setMessage("Code: applied!") } }}>Apply</button>
-          </div>
-          {promoApplied && <p className="checkout-promo-success"><Check size={14} />{message}<button onClick={() => { setPromoApplied(false); setPromo("") }} aria-label="Remove promo code">×</button></p>}
-          <div className="checkout-totals">
-            <p><span>Subtotal</span><b>{subtotal} Tk</b></p>
-            <p><span>Discount</span><b className="checkout-discount">− 0 Tk</b></p>
-          </div>
-          <div className="checkout-grand-total"><strong>Total Amount</strong><b>{subtotal} Tk</b></div>
-        </section>
-        <div className="checkout-payment-actions">
-          <button className="checkout-rfid-button" onClick={() => setRfidOpen(true)}><WalletCards size={20} /> Pay with RFID Card</button>
-          <button className="checkout-pay-button" onClick={() => setMessage("Payment gateway will be connected in the backend phase.")}>Pay Now</button>
-          {message && !promoApplied && <p role="status" className="checkout-message">{message}</p>}
-        </div>
-      </div>
-      {rfidOpen && (
-        <div className="kiosk-overlay" role="presentation" onClick={() => setRfidOpen(false)}>
-          <section className="kiosk-modal checkout-rfid-modal" role="dialog" aria-modal="true" aria-labelledby="rfid-title" onClick={(event) => event.stopPropagation()}>
-            <button className="kiosk-modal-close" onClick={() => setRfidOpen(false)} aria-label="Close">×</button>
-            <WalletCards size={28} />
-            <h2 id="rfid-title">Get your free RFID subscription</h2>
-            <p>Bring your university ID card to activate a free RFID subscription, or contact the hall machine coordinator for help.</p>
-            <address className="checkout-rfid-contact">
-              <strong>Bruce Wayne</strong>
-              <span>221B Baker Street, Jagannath Hall</span>
-              <a href="tel:+8801700000221"><Phone size={15} aria-hidden="true" /> +880 1700-000-221</a>
-            </address>
-            <button className="kiosk-checkout-link" onClick={() => setRfidOpen(false)}>Got it</button>
-          </section>
-        </div>
-      )}
-    </main>
-  )
+type CheckoutPageProps = {
+  searchParams: Promise<{ product?: string; deviceId?: string }>
 }
 
-export default function CheckoutPage() {
-  return <Suspense fallback={<main className="checkout-compact-page" />}><CheckoutScreen /></Suspense>
+export const dynamic = "force-dynamic"
+
+export default async function CheckoutPage({ searchParams }: CheckoutPageProps) {
+  const { product, deviceId } = await searchParams
+  const selectedProduct = await getBrewbotProduct(product)
+  return <CheckoutScreen product={selectedProduct} requestedDeviceId={deviceId} />
 }
