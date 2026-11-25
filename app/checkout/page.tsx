@@ -18,7 +18,7 @@ function CheckoutScreen() {
     ? requestedDeviceId
     : null
   const deviceHomePath = validDeviceId ? `/${encodeURIComponent(validDeviceId)}` : "/"
-  const [seconds, setSeconds] = useState(180)
+  const [seconds, setSeconds] = useState(45)
   const [epsOpen, setEpsOpen] = useState(false)
   const [rfidOpen, setRfidOpen] = useState(false)
 
