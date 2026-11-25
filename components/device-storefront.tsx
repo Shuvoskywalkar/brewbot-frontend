@@ -27,7 +27,6 @@ export function DeviceStorefront({ deviceId, universityName, locationName }: Dev
       <section className="kiosk-location" aria-label="Device location">
         <div className="kiosk-location-header">
           <BrewBotLogo className="kiosk-brand" />
-          <Link className="kiosk-topup-link" href={`/recharge?deviceId=${encodeURIComponent(deviceId)}`}><WalletCards aria-hidden="true" /> Add balance to RFID</Link>
         </div>
         <div className="kiosk-location-title"><Building2 className="kiosk-building-icon" aria-hidden="true"/><h1>{universityName}</h1></div>
         <p className="kiosk-hall"><MapPin size={17} fill="currentColor"/> {locationName}</p>
@@ -47,6 +46,8 @@ export function DeviceStorefront({ deviceId, universityName, locationName }: Dev
           </article>
         ))}
       </section>
+
+      <Link className="kiosk-topup-link" href={`/recharge?deviceId=${encodeURIComponent(deviceId)}`}><WalletCards aria-hidden="true" /> Add balance to RFID</Link>
 
       <aside className="kiosk-ad-slot" aria-label="Advertisement">
         <Image src="/blm-ad-banner.png" alt="" fill sizes="(max-width: 420px) 100vw, 400px"/>
