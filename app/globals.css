@@ -352,7 +352,6 @@ a { color: inherit; text-decoration: none; }
 .maintenance-illustration { position: relative; display: grid; place-items: center; width: 130px; height: 130px; margin-bottom: 29px; }
 .maintenance-circle { display: grid; place-items: center; width: 106px; height: 106px; border: 1px solid #e7e5d9; border-radius: 50%; background: #f0eee3; color: #4c624b; }
 .tool-bubble { position: absolute; right: 1px; bottom: 7px; display: grid; place-items: center; width: 39px; height: 39px; border: 3px solid #f7f7f2; border-radius: 50%; background: #e8d9c2; color: #796347; }
-.maintenance-star { position: absolute; top: 3px; right: 9px; color: #b47b4c; font-size: 20px; }
 .maintenance-content .eyebrow { margin-bottom: 10px; }
 .maintenance-content h1 { margin: 0; font-size: 47px; line-height: 1.03; letter-spacing: -2px; }
 .maintenance-copy { max-width: 350px; margin: 16px auto 23px; color: #777d72; font-size: 12px; line-height: 1.7; }
@@ -481,12 +480,8 @@ a { color: inherit; text-decoration: none; }
 /* Compact, phone-first customer kiosk */
 .kiosk-screen { position: relative; width: 100%; max-width: 720px; min-height: 100svh; margin: 0 auto; padding: 10px 10px 58px; overflow-x: hidden; background: #f0f1f5; color: #303541; }
 .kiosk-location { position: relative; min-height: 104px; margin-bottom: 10px; padding: 13px 14px; border-radius: 10px; background: #34383e; color: #fff; box-shadow: 0 5px 9px #24283120; }
-.kiosk-location-header { display: flex; align-items: center; justify-content: flex-start; margin-bottom: 12px; }
-.kiosk-brand { display: inline-flex; flex: 0 0 auto; align-items: center; gap: 8px; color: #fff; }
-.kiosk-brand-mark { width: 30px; height: 30px; fill: none; stroke: #f3bf62; stroke-linecap: round; stroke-linejoin: round; stroke-width: 1.6; }
-.kiosk-brand-eye { fill: #f3bf62; stroke: none; }
-.kiosk-brand-word { font-size: 17px; font-weight: 750; letter-spacing: -.55px; }
-.kiosk-brand-word span { color: #f3bf62; font-weight: 650; }
+.kiosk-location-header { display: flex; align-items: center; justify-content: flex-start; gap: 8px; margin-bottom: 11px; }
+.kiosk-brand { display: inline-flex; flex: 0 0 auto; align-items: center; gap: 6px; color: #fff; }
 .kiosk-location-title { display: flex; align-items: center; gap: 10px; }
 .kiosk-building-icon { width: 26px; height: 30px; color: #fff; stroke-width: 2.5; }
 .kiosk-location-title h1 { margin: 0; font-size: 20px; line-height: 1.15; letter-spacing: -.5px; }
@@ -518,6 +513,7 @@ a { color: inherit; text-decoration: none; }
 .kiosk-modal h2 { margin: 0 0 15px; font-size: 20px; }
 .kiosk-modal-close { position: absolute; top: 10px; right: 13px; border: 0; background: transparent; color: #686d76; font-size: 25px; }
 .kiosk-empty, .kiosk-wallet-modal > p, .checkout-rfid-modal > p { color: #737983; font-size: 13px; line-height: 1.5; }
+.checkout-rfid-modal > p { margin: 0; font-size: 12px; line-height: 1.4; }
 .kiosk-cart-lines { display: flex; flex-direction: column; gap: 12px; }
 .kiosk-cart-line { display: grid; grid-template-columns: 1fr auto auto; align-items: center; gap: 9px; padding: 10px 0; border-bottom: 1px solid #eceef2; font-size: 12px; }
 .kiosk-cart-line small { display: block; margin-top: 4px; color: #858a93; font-size: 10px; }
@@ -530,7 +526,8 @@ a { color: inherit; text-decoration: none; }
 .kiosk-wallet-modal > svg, .checkout-rfid-modal > svg { color: #333844; }
 .kiosk-wallet-modal h2, .checkout-rfid-modal h2 { margin-top: 10px; }
 .checkout-rfid-modal { text-align: center; }
-.checkout-rfid-contact { display: flex; flex-direction: column; align-items: center; gap: 7px; margin: 17px 0; padding: 14px; border: 1px solid #eceef1; border-radius: 12px; background: #f8f9fb; color: #4a4f59; font-size: 12px; font-style: normal; line-height: 1.5; }
+.checkout-rfid-modal h2 { margin-bottom: 10px; }
+.checkout-rfid-contact { display: flex; flex-direction: column; align-items: center; gap: 6px; margin: 14px 0; padding: 12px; border: 1px solid #eceef1; border-radius: 12px; background: #f8f9fb; color: #4a4f59; font-size: 12px; font-style: normal; line-height: 1.5; }
 .checkout-rfid-contact strong { color: #303541; font-size: 14px; }
 .checkout-rfid-contact a { display: inline-flex; align-items: center; gap: 6px; margin-top: 2px; color: #4141f5; font-weight: 700; }
 .checkout-compact-page { min-height: 100svh; padding-bottom: 128px; background: #f0f1f5; color: #303541; }
@@ -667,13 +664,14 @@ a { color: inherit; text-decoration: none; }
 .brewbot-word { color: currentColor; font-size: 19px; font-weight: 760; letter-spacing: -.8px; }
 .brewbot-word > span { color: #5d8062; }
 .kiosk-brand { color: #fff; }
-  .kiosk-brand .brewbot-mark { width: 30px; height: 30px; stroke: #f3bf62; stroke-width: 1.6; }
-  .kiosk-brand .brewbot-eye { fill: #f3bf62; }
-  .kiosk-brand .brewbot-word { font-size: 17px; letter-spacing: -.55px; }
-  .kiosk-brand .brewbot-word > span { color: #f3bf62; }
+.kiosk-brand .brewbot-mark { width: 25px; height: 25px; stroke: #dedede; stroke-width: 1.5; }
+.kiosk-brand .brewbot-eye { fill: #dedede; }
+.kiosk-brand .brewbot-word { font-size: 14px; letter-spacing: -.45px; }
+.kiosk-brand .brewbot-word > span { color: #dedede; }
 
 /* Owner and device-maintainer workspaces */
 .ops-shell { --ops-ink: #20352a; --ops-muted: #758078; --ops-line: #e4e9e2; --ops-green: #28583a; display: flex; min-height: 100vh; background: #f6f8f5; color: var(--ops-ink); }
+.recharge-page, .maintenance-page, .ops-shell { filter: grayscale(1); }
 .ops-sidebar { position: sticky; top: 0; display: flex; flex: 0 0 222px; flex-direction: column; min-height: 100vh; padding: 23px 15px 16px; border-right: 1px solid var(--ops-line); background: #fff; }
 .ops-brand { display: inline-flex; align-self: flex-start; margin: 0 5px 28px; text-decoration: none; }
 .ops-brand .brewbot-mark { width: 29px; height: 29px; }
@@ -747,6 +745,7 @@ a { color: inherit; text-decoration: none; }
 .ops-table { width: 100%; margin-top: 13px; border-collapse: collapse; text-align: left; white-space: nowrap; }
 .ops-table th { padding: 0 10px 8px; color: #8f9991; font-size: 8px; font-weight: 650; letter-spacing: .06em; }
 .ops-table td { padding: 10px; border-top: 1px solid #eef1ed; color: #748077; font-size: 9px; }
+.ops-table .ops-empty-table { padding: 18px 10px; color: var(--ops-muted); text-align: center; }
 .ops-table td:first-child, .ops-table td:nth-child(5) { color: #34463a; font-weight: 650; }
 .ops-order-status { padding: 4px 7px; border-radius: 14px; background: #edf5ed; color: #4b7650; font-size: 8px; }
 .ops-record-count { padding: 5px 8px; border-radius: 20px; background: #f3f6f2; color: #738075; font-size: 9px; white-space: nowrap; }
@@ -781,8 +780,9 @@ a { color: inherit; text-decoration: none; }
 .ops-file-help { color: #929d94; font-size: 8px; line-height: 1.4; }
 .ops-ad-preview { padding: 11px; border: 1px solid #e8ece6; border-radius: 9px; background: #f9faf8; }
 .ops-ad-preview .ops-eyebrow { margin-bottom: 9px; }
-.ops-ad-image { position: relative; overflow: hidden; width: 100%; aspect-ratio: 2.8 / 1; border-radius: 6px; background: #edf0eb; }
+.ops-ad-image { position: relative; display: grid; place-items: center; overflow: hidden; width: 100%; aspect-ratio: 2.8 / 1; border-radius: 6px; background: #edf0eb; }
 .ops-ad-image img { object-fit: cover; }
+.ops-ad-image .ops-empty { margin: 0; padding: 10px; text-align: center; }
 .ops-ad-preview > strong { display: block; margin-top: 10px; font-size: 11px; }
 .ops-ad-preview > p { margin: 5px 0 0; color: var(--ops-muted); font-size: 9px; line-height: 1.5; }
 .ops-maintainer-label { display: flex; align-items: center; gap: 8px; margin: 25px 8px; color: #55735a; font-size: 9px; font-weight: 700; letter-spacing: .08em; }

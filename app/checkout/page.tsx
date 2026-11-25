@@ -66,7 +66,7 @@ function CheckoutScreen() {
             <button className="kiosk-modal-close" onClick={() => setRfidOpen(false)} aria-label="Close">×</button>
             <WalletCards size={28} />
             <h2 id="rfid-title">Get your free RFID subscription</h2>
-            <p>Bring your university ID card to activate a free RFID subscription, or contact the hall machine coordinator for help.</p>
+            <p>Hold your RFID card in front of the machine&apos;s card reader. Wait up to 60 seconds for your order to dispense. No card? Bring your university ID or contact the hall machine coordinator.</p>
             <address className="checkout-rfid-contact">
               <strong>Bruce Wayne</strong>
               <span>221B Baker Street, Jagannath Hall</span>

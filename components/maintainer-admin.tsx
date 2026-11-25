@@ -4,17 +4,12 @@ import Link from "next/link"
 import { useState } from "react"
 import { ArrowLeft, ArrowRight, Radio, ShieldCheck, Store, UserRoundPlus, X } from "lucide-react"
 import { BrewBotLogo } from "@/components/brewbot-logo"
-import { DEFAULT_DEVICE_PATH } from "@/lib/device-routes"
+import { DEFAULT_DEVICE_ID, DEFAULT_DEVICE_PATH } from "@/lib/device-routes"
 
 type RfidMember = { id: string; userName: string; cardId: string }
 
-const initialMembers: RfidMember[] = [
-  { id: "member-1", userName: "Ayesha Rahman", cardId: "04A9-7C21" },
-  { id: "member-2", userName: "Nabil Ahmed", cardId: "91C2-18F4" },
-]
-
 export function MaintainerAdmin() {
-  const [members, setMembers] = useState(initialMembers)
+  const [members, setMembers] = useState<RfidMember[]>([])
   const [userName, setUserName] = useState("")
   const [cardId, setCardId] = useState("")
   const [pendingCancel, setPendingCancel] = useState<string | null>(null)
@@ -25,19 +20,19 @@ export function MaintainerAdmin() {
     const normalizedUserName = userName.trim().replace(/\s+/g, " ")
     const normalizedCardId = cardId.trim().toUpperCase()
     if (members.some((member) => member.cardId === normalizedCardId || member.userName.toLowerCase() === normalizedUserName.toLowerCase())) {
-      setFeedback("That user name or RFID card is already registered in this preview.")
+      setFeedback("That user name or RFID card is already registered in this session.")
       return
     }
     setMembers((current) => [...current, { id: `${Date.now()}`, userName: normalizedUserName, cardId: normalizedCardId }])
     setUserName("")
     setCardId("")
-    setFeedback("RFID registration added to this preview only.")
+    setFeedback("RFID registration is temporary in this session.")
   }
 
   function cancelRegistration(member: RfidMember) {
     setMembers((current) => current.filter((entry) => entry.id !== member.id))
     setPendingCancel(null)
-    setFeedback(`RFID access for ${member.userName} was removed from this preview.`)
+    setFeedback(`RFID access for ${member.userName} was removed for this session.`)
   }
 
   return (
@@ -54,7 +49,6 @@ export function MaintainerAdmin() {
             <span><strong>Owner workspace</strong><small>Orders, menu & ads</small></span>
             <ArrowRight aria-hidden="true" />
           </Link>
-          <p>Preview workspace · not connected to live records</p>
         </div>
       </aside>
 
@@ -63,13 +57,12 @@ export function MaintainerAdmin() {
           <div className="ops-breadcrumb"><span>Device maintainer</span><b aria-hidden="true">/</b>RFID users</div>
           <div className="ops-top-actions">
             <Link className="ops-role-switch" href="/admin" aria-label="Switch to owner workspace"><ArrowLeft aria-hidden="true" /><span>Owner</span></Link>
-            <span className="ops-preview-pill"><i aria-hidden="true" /> Preview mode</span>
           </div>
         </header>
         <div className="ops-content">
           <div className="ops-page-heading">
             <div>
-              <p className="ops-eyebrow">DEVICE APD260209001</p>
+              <p className="ops-eyebrow">DEVICE {DEFAULT_DEVICE_ID}</p>
               <h1>Device maintainer</h1>
               <p>Check your assigned kiosk and manage RFID access.</p>
             </div>
@@ -78,19 +71,19 @@ export function MaintainerAdmin() {
 
           <div className="ops-preview-note" role="note">
             <span className="ops-note-dot" aria-hidden="true" />
-            Preview data only. Registration and cancellation are temporary until backend integration is connected.
+            RFID changes are temporary and will not be saved after leaving this page.
           </div>
           {feedback && <p className="ops-feedback" role="status">{feedback}</p>}
 
           <section className="ops-card ops-maintainer-device" aria-labelledby="maintainer-device-heading">
             <div className="ops-card-heading">
               <div><p className="ops-eyebrow">DEVICE SUMMARY</p><h2 id="maintainer-device-heading">Jagannath Hall kiosk</h2></div>
-              <span className="ops-status"><i aria-hidden="true" /> Online</span>
+              <span className="ops-status">Status unavailable</span>
             </div>
             <div className="ops-device-details">
               <span className="ops-device-icon"><Radio aria-hidden="true" /></span>
-              <div><strong>University of Dhaka</strong><span>Main entrance · Last sync just now</span></div>
-              <code>APD260209001</code>
+              <div><strong>University of Dhaka</strong><span>Main entrance · Connection status unavailable</span></div>
+              <code>{DEFAULT_DEVICE_ID}</code>
             </div>
           </section>
 
@@ -115,7 +108,7 @@ export function MaintainerAdmin() {
                 <span className="ops-record-count">{String(members.length).padStart(2, "0")} users</span>
               </div>
               <div className="ops-member-list">
-                {members.length === 0 ? <p className="ops-empty">No RFID users are registered in this preview.</p> : members.map((member) => (
+                {members.length === 0 ? <p className="ops-empty">No RFID users have been registered for this device.</p> : members.map((member) => (
                   <article className="ops-member-row" key={member.id}>
                     <span className="ops-member-avatar" aria-hidden="true">{member.userName.slice(-2)}</span>
                     <div className="ops-member-copy"><strong>{member.userName}</strong><span>Card · {member.cardId}</span></div>
@@ -132,7 +125,7 @@ export function MaintainerAdmin() {
               </div>
             </section>
           </div>
-          <p className="ops-page-footnote">RFID changes are kept in browser memory for this preview only.</p>
+          <p className="ops-page-footnote">RFID changes are not saved after leaving this page.</p>
         </div>
       </section>
     </main>
