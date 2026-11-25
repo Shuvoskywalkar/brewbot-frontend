@@ -25,7 +25,13 @@ function requestIsSameOrigin(request: NextRequest) {
       request.nextUrl.protocol.replace(":", ""),
     ].map((protocol) => protocol.trim().toLowerCase()).filter((protocol) => protocol === "http" || protocol === "https")
 
-    return hosts.some((host) => protocols.some((protocol) => suppliedOrigin === `${protocol}://${host}`))
+    return hosts.some((host) => protocols.some((protocol) => {
+      try {
+        return suppliedOrigin === new URL(`${protocol}://${host}`).origin
+      } catch {
+        return false
+      }
+    }))
   } catch {
     return false
   }
