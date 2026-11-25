@@ -4,6 +4,8 @@ import { getActiveDevice } from "@/lib/device-registry"
 import { getActiveProducts } from "@/lib/products"
 import { getActiveCampaign } from "@/lib/campaigns"
 
+export const dynamic = "force-dynamic"
+
 type DevicePageProps = {
   params: Promise<{ deviceId: string }>
 }

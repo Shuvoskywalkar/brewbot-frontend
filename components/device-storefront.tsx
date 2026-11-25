@@ -46,6 +46,17 @@ export function DeviceStorefront({ deviceId, universityName, locationName, initi
   })
   const products = data?.products ?? []
   const campaign = campaignData?.campaign ?? null
+  const latestStockUpdate = products.reduce(
+    (latest, product) => Math.max(latest, Date.parse(product.updatedAt)),
+    0,
+  )
+  const stockUpdatedAt = latestStockUpdate
+    ? new Intl.DateTimeFormat("en-BD", {
+        dateStyle: "medium",
+        timeStyle: "short",
+        timeZone: "Asia/Dhaka",
+      }).format(latestStockUpdate)
+    : null
   const displayUniversityName = universityName.trim() === "Dhaka University" ? "University of Dhaka" : universityName
   const buy = (id: string) => router.push(`/checkout?product=${encodeURIComponent(id)}&deviceId=${encodeURIComponent(deviceId)}`)
 
@@ -56,7 +67,7 @@ export function DeviceStorefront({ deviceId, universityName, locationName, initi
           <div className="kiosk-location-details">
             <div className="kiosk-location-title"><Building2 className="kiosk-building-icon" aria-hidden="true"/><h1>{displayUniversityName}</h1></div>
             <p className="kiosk-hall"><MapPin size={17} fill="currentColor"/> {locationName}</p>
-            <p className="kiosk-last-stock">Last Stock: 24 Nov, 09:45 PM</p>
+            {stockUpdatedAt && <p className="kiosk-last-stock">Last stocked: {stockUpdatedAt}</p>}
           </div>
           <div className="kiosk-brand-stack">
             <BrewBotLogo className="kiosk-brand" />
@@ -100,7 +111,11 @@ export function DeviceStorefront({ deviceId, universityName, locationName, initi
             </div>
           </>
         ) : (
-          <Image src="/blm-ad-banner.png" alt="Raised hands silhouetted against a light background" fill sizes="(max-width: 420px) 100vw, 400px" />
+          <div className="kiosk-ad-copy">
+            <span>LIVE CAMPAIGNS</span>
+            <strong>No active campaign</strong>
+            <p>Published promotions will appear here.</p>
+          </div>
         )}
       </aside>
 

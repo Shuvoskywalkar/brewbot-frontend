@@ -9,14 +9,29 @@ export const dynamic = "force-dynamic"
 type RouteContext = { params: Promise<{ productId: string }> }
 
 function requestIsSameOrigin(request: NextRequest) {
-  const host = request.headers.get("x-forwarded-host")?.split(",")[0]?.trim() || request.headers.get("host")
-  const protocol = request.headers.get("x-forwarded-proto")?.split(",")[0]?.trim() || request.nextUrl.protocol.replace(":", "")
-  const expectedOrigin = host && (protocol === "http" || protocol === "https")
-    ? new URL(`${protocol}://${host}`).origin
-    : request.nextUrl.origin
+  const origin = request.headers.get("origin")
+  if (!origin) return false
 
   try {
-    return new URL(request.headers.get("origin") ?? "").origin === expectedOrigin
+    const suppliedOrigin = new URL(origin).origin
+    const forwardedHosts = request.headers.get("x-forwarded-host")?.split(",") ?? []
+    const hosts = [
+      ...forwardedHosts,
+      request.headers.get("host") ?? "",
+      request.nextUrl.host,
+    ].map((host) => host.trim().toLowerCase()).filter(Boolean)
+    const protocols = [
+      ...(request.headers.get("x-forwarded-proto")?.split(",") ?? []),
+      request.nextUrl.protocol.replace(":", ""),
+    ].map((protocol) => protocol.trim().toLowerCase()).filter((protocol) => protocol === "http" || protocol === "https")
+
+    return hosts.some((host) => protocols.some((protocol) => {
+      try {
+        return suppliedOrigin === new URL(`${protocol}://${host}`).origin
+      } catch {
+        return false
+      }
+    }))
   } catch {
     return false
   }

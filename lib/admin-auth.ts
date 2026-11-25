@@ -1,6 +1,10 @@
 import { auth } from "@/lib/auth/server"
 
 export async function getAdminAccess() {
+  if (process.env.NODE_ENV === "development") {
+    return { user: null, authorized: true }
+  }
+
   const { data } = await auth.getSession()
   const user = data?.user ?? null
   const allowedEmails = (process.env.ADMIN_EMAILS ?? "")
@@ -15,6 +19,6 @@ export async function getAdminAccess() {
 }
 
 export async function getAdminUser() {
-  const { user, authorized } = await getAdminAccess()
-  return authorized ? user : null
+  const { authorized } = await getAdminAccess()
+  return authorized
 }

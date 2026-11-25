@@ -11,6 +11,7 @@ export type BrewbotProduct = {
   stock: number
   isActive: boolean
   sortOrder: number
+  updatedAt: string
 }
 
 function toBrewbotProduct(product: typeof products.$inferSelect): BrewbotProduct {
@@ -23,6 +24,7 @@ function toBrewbotProduct(product: typeof products.$inferSelect): BrewbotProduct
     stock: product.stock,
     isActive: product.isActive,
     sortOrder: product.sortOrder,
+    updatedAt: product.updatedAt.toISOString(),
   }
 }
 
