@@ -67,7 +67,7 @@ export function DeviceStorefront({ deviceId, universityName, locationName, initi
           <div className="kiosk-location-details">
             <div className="kiosk-location-title"><Building2 className="kiosk-building-icon" aria-hidden="true"/><h1>{displayUniversityName}</h1></div>
             <p className="kiosk-hall"><MapPin size={17} fill="currentColor"/> {locationName}</p>
-            {stockUpdatedAt && <p className="kiosk-last-stock">Inventory updated: {stockUpdatedAt}</p>}
+            {stockUpdatedAt && <p className="kiosk-last-stock">Last stocked: {stockUpdatedAt}</p>}
           </div>
           <div className="kiosk-brand-stack">
             <BrewBotLogo className="kiosk-brand" />
