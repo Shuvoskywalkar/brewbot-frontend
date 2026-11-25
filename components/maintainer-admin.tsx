@@ -6,30 +6,30 @@ import { ArrowLeft, ArrowRight, Radio, ShieldCheck, Store, UserRoundPlus, X } fr
 import { BrewBotLogo } from "@/components/brewbot-logo"
 import { DEFAULT_DEVICE_PATH } from "@/lib/device-routes"
 
-type RfidMember = { id: string; studentId: string; cardId: string }
+type RfidMember = { id: string; userName: string; cardId: string }
 
 const initialMembers: RfidMember[] = [
-  { id: "member-1", studentId: "JNU-2026-0142", cardId: "04A9-7C21" },
-  { id: "member-2", studentId: "JNU-2026-0198", cardId: "91C2-18F4" },
+  { id: "member-1", userName: "Ayesha Rahman", cardId: "04A9-7C21" },
+  { id: "member-2", userName: "Nabil Ahmed", cardId: "91C2-18F4" },
 ]
 
 export function MaintainerAdmin() {
   const [members, setMembers] = useState(initialMembers)
-  const [studentId, setStudentId] = useState("")
+  const [userName, setUserName] = useState("")
   const [cardId, setCardId] = useState("")
   const [pendingCancel, setPendingCancel] = useState<string | null>(null)
   const [feedback, setFeedback] = useState("")
 
   function registerMember(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
-    const normalizedStudentId = studentId.trim().toUpperCase()
+    const normalizedUserName = userName.trim().replace(/\s+/g, " ")
     const normalizedCardId = cardId.trim().toUpperCase()
-    if (members.some((member) => member.cardId === normalizedCardId || member.studentId === normalizedStudentId)) {
-      setFeedback("That student ID or RFID card is already registered in this preview.")
+    if (members.some((member) => member.cardId === normalizedCardId || member.userName.toLowerCase() === normalizedUserName.toLowerCase())) {
+      setFeedback("That user name or RFID card is already registered in this preview.")
       return
     }
-    setMembers((current) => [...current, { id: `${Date.now()}`, studentId: normalizedStudentId, cardId: normalizedCardId }])
-    setStudentId("")
+    setMembers((current) => [...current, { id: `${Date.now()}`, userName: normalizedUserName, cardId: normalizedCardId }])
+    setUserName("")
     setCardId("")
     setFeedback("RFID registration added to this preview only.")
   }
@@ -37,7 +37,7 @@ export function MaintainerAdmin() {
   function cancelRegistration(member: RfidMember) {
     setMembers((current) => current.filter((entry) => entry.id !== member.id))
     setPendingCancel(null)
-    setFeedback(`RFID access for ${member.studentId} was removed from this preview.`)
+    setFeedback(`RFID access for ${member.userName} was removed from this preview.`)
   }
 
   return (
@@ -97,12 +97,12 @@ export function MaintainerAdmin() {
           <div className="ops-maintainer-grid">
             <section className="ops-card ops-rfid-form-card" aria-labelledby="rfid-register-heading">
               <div className="ops-card-heading">
-                <div><p className="ops-eyebrow">RFID ACCESS</p><h2 id="rfid-register-heading">Register a user</h2><p>Link a student ID to one RFID card.</p></div>
+                <div><p className="ops-eyebrow">RFID ACCESS</p><h2 id="rfid-register-heading">Register a user</h2><p>Link a person&apos;s name to one RFID card.</p></div>
                 <span className="ops-form-icon"><UserRoundPlus aria-hidden="true" /></span>
               </div>
               <form className="ops-rfid-form" onSubmit={registerMember}>
-                <label htmlFor="student-id">Student ID</label>
-                <input id="student-id" value={studentId} onChange={(event) => setStudentId(event.target.value)} placeholder="e.g. JNU-2026-0210" autoComplete="off" required />
+                <label htmlFor="user-name">User name</label>
+                <input id="user-name" value={userName} onChange={(event) => setUserName(event.target.value)} placeholder="Enter the cardholder&apos;s name" autoComplete="name" required />
                 <label htmlFor="rfid-card-id">RFID card number</label>
                 <input id="rfid-card-id" value={cardId} onChange={(event) => setCardId(event.target.value)} placeholder="Scan or enter card number" autoComplete="off" required />
                 <button className="ops-button-primary" type="submit"><UserRoundPlus aria-hidden="true" /> Register RFID user</button>
@@ -117,10 +117,10 @@ export function MaintainerAdmin() {
               <div className="ops-member-list">
                 {members.length === 0 ? <p className="ops-empty">No RFID users are registered in this preview.</p> : members.map((member) => (
                   <article className="ops-member-row" key={member.id}>
-                    <span className="ops-member-avatar" aria-hidden="true">{member.studentId.slice(-2)}</span>
-                    <div className="ops-member-copy"><strong>{member.studentId}</strong><span>Card · {member.cardId}</span></div>
+                    <span className="ops-member-avatar" aria-hidden="true">{member.userName.slice(-2)}</span>
+                    <div className="ops-member-copy"><strong>{member.userName}</strong><span>Card · {member.cardId}</span></div>
                     {pendingCancel === member.id ? (
-                      <div className="ops-cancel-confirm" role="group" aria-label={`Confirm cancellation for ${member.studentId}`}>
+                      <div className="ops-cancel-confirm" role="group" aria-label={`Confirm cancellation for ${member.userName}`}>
                         <button className="ops-cancel-confirm-button" type="button" onClick={() => cancelRegistration(member)}>Confirm</button>
                         <button className="ops-icon-action" type="button" onClick={() => setPendingCancel(null)} aria-label="Keep RFID access"><X aria-hidden="true" /></button>
                       </div>
