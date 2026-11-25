@@ -1,6 +1,7 @@
 import { del, put } from "@vercel/blob"
 import { NextRequest, NextResponse } from "next/server"
 import { getAdminUser } from "@/lib/admin-auth"
+import { isSameOriginRequest } from "@/lib/request-origin"
 import { getActiveCampaign, saveActiveCampaign } from "@/lib/campaigns"
 
 export const dynamic = "force-dynamic"
@@ -12,35 +13,6 @@ const artworkExtensions: Record<string, string> = {
   "image/jpeg": "jpg",
   "image/png": "png",
   "image/webp": "webp",
-}
-
-function requestIsSameOrigin(request: NextRequest) {
-  const origin = request.headers.get("origin")
-  if (!origin) return false
-
-  try {
-    const suppliedOrigin = new URL(origin).origin
-    const forwardedHosts = request.headers.get("x-forwarded-host")?.split(",") ?? []
-    const hosts = [
-      ...forwardedHosts,
-      request.headers.get("host") ?? "",
-      request.nextUrl.host,
-    ].map((host) => host.trim().toLowerCase()).filter(Boolean)
-    const protocols = [
-      ...(request.headers.get("x-forwarded-proto")?.split(",") ?? []),
-      request.nextUrl.protocol.replace(":", ""),
-    ].map((protocol) => protocol.trim().toLowerCase()).filter((protocol) => protocol === "http" || protocol === "https")
-
-    return hosts.some((host) => protocols.some((protocol) => {
-      try {
-        return suppliedOrigin === new URL(`${protocol}://${host}`).origin
-      } catch {
-        return false
-      }
-    }))
-  } catch {
-    return false
-  }
 }
 
 async function adminResponse() {
@@ -71,7 +43,7 @@ export async function GET() {
 export async function PUT(request: NextRequest) {
   const denied = await adminResponse()
   if (denied) return denied
-  if (!requestIsSameOrigin(request)) return NextResponse.json({ error: "Invalid request origin." }, { status: 403 })
+  if (!isSameOriginRequest(request)) return NextResponse.json({ error: "Invalid request origin." }, { status: 403 })
 
   let formData: FormData
   try {
