@@ -970,6 +970,7 @@ body:has(.checkout-compact-page) { background: #0b0b0b; }
 .checkout-payment-actions .checkout-message { padding: 8px 10px; color: #881337; font-size: 12px; line-height: 1.4; }
   .checkout-payment-button-wrap { display: flex; flex-direction: column; gap: 6px; width: 100%; }
   .checkout-payment-button-wrap .checkout-pay-button { display: flex; align-items: center; justify-content: center; width: 100%; min-height: 40px; border: 0; border-radius: 11px; background: #111; color: #fff; font-size: 13px; font-weight: 700; }
+  .checkout-payment-button-wrap .checkout-gateway-fallback { text-decoration: none; }
   .checkout-payment-button-wrap .checkout-pay-button:disabled { opacity: .62; cursor: wait; }
   .checkout-payment-button-wrap .checkout-message { margin: 0; padding: 8px 10px; color: #881337; font-size: 12px; line-height: 1.4; }
   .checkout-rfid-contact a { color: #111; }
