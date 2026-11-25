@@ -25,11 +25,13 @@ export function DeviceStorefront({ deviceId, universityName, locationName }: Dev
   return (
     <main className="kiosk-screen">
       <section className="kiosk-location" aria-label="Device location">
-        <BrewBotLogo className="kiosk-brand" />
+        <div className="kiosk-location-header">
+          <BrewBotLogo className="kiosk-brand" />
+          <Link className="kiosk-topup-link" href={`/recharge?deviceId=${encodeURIComponent(deviceId)}`}><WalletCards aria-hidden="true" /> Add balance to RFID</Link>
+        </div>
         <div className="kiosk-location-title"><Building2 className="kiosk-building-icon" aria-hidden="true"/><h1>{universityName}</h1></div>
         <p className="kiosk-hall"><MapPin size={17} fill="currentColor"/> {locationName}</p>
         <p className="kiosk-last-stock">Last Stock: 24 Nov, 09:45 PM</p>
-        <Link className="kiosk-topup-link" href={`/recharge?deviceId=${encodeURIComponent(deviceId)}`}><WalletCards aria-hidden="true" /> Add balance to RFID</Link>
         <span className="kiosk-device-id">{deviceId}</span>
       </section>
 
