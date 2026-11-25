@@ -5,25 +5,21 @@ import Link from "next/link"
 import { Suspense, useEffect, useState } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { ArrowLeft, Clock3, Phone, WalletCards } from "lucide-react"
-
-const products = [
-  { id: "masala-tea", name: "Masala Raw Tea", price: 10, image: "/tea-cup.png" },
-  { id: "milk-tea", name: "Milk Tea", price: 15, image: "/milk-tea-cup.png" },
-  { id: "coffee", name: "Coffee", price: 20, image: "/coffee-cup.png" },
-]
+import { EPSCheckoutForm } from "@/components/eps-checkout-form"
+import { brewbotProducts, getBrewbotProduct } from "@/lib/products"
 
 function CheckoutScreen() {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const selectedId = products.some((product) => product.id === searchParams.get("product")) ? searchParams.get("product")! : "masala-tea"
+  const selected = getBrewbotProduct(searchParams.get("product"))
+    ?? brewbotProducts.find((product) => product.id === "masala-tea")!
   const requestedDeviceId = searchParams.get("deviceId")
-  const deviceHomePath = requestedDeviceId && /^[A-Z0-9_-]{1,64}$/.test(requestedDeviceId)
-    ? `/${encodeURIComponent(requestedDeviceId)}`
-    : "/"
-  const [seconds, setSeconds] = useState(45)
-  const [message, setMessage] = useState("")
+  const validDeviceId = requestedDeviceId && /^[A-Z0-9_-]{1,64}$/.test(requestedDeviceId)
+    ? requestedDeviceId
+    : null
+  const deviceHomePath = validDeviceId ? `/${encodeURIComponent(validDeviceId)}` : "/"
+  const [seconds, setSeconds] = useState(180)
   const [rfidOpen, setRfidOpen] = useState(false)
-  const selected = products.find((product) => product.id === selectedId)!
 
   useEffect(() => {
     const timerId = window.setInterval(() => {
@@ -49,16 +45,16 @@ function CheckoutScreen() {
         <span className="checkout-countdown" role="timer" aria-label={`${seconds} seconds remaining`}><Clock3 size={16} /> {seconds}s</span>
       </header>
       <div className="checkout-compact-content">
-        <section className="checkout-product-card">
+        <section className="checkout-product-card" aria-label="Selected drink">
           <Image src={selected.image} alt={selected.name} width={76} height={76} />
-          <div className="checkout-product-copy"><h2>{selected.name}</h2><p>{selected.price}.00 Tk</p></div>
-          <strong className="checkout-product-price">{selected.price} Tk</strong>
+          <div className="checkout-product-copy"><h2>{selected.name}</h2><p>Selected drink</p></div>
+          <strong className="checkout-product-price">{(selected.pricePaisa / 100).toFixed(2)} Tk</strong>
         </section>
-        <div className="checkout-payment-actions">
-          <button className="checkout-rfid-button" onClick={() => setRfidOpen(true)}><WalletCards size={20} /> Pay with RFID Card</button>
-          <button className="checkout-pay-button" onClick={() => setMessage("Payment gateway will be connected in the backend phase.")}>Pay Now</button>
-          {message && <p role="status" className="checkout-message">{message}</p>}
-        </div>
+        <EPSCheckoutForm
+          productId={selected.id}
+          deviceId={validDeviceId}
+          onRFIDClick={() => setRfidOpen(true)}
+        />
       </div>
       {rfidOpen && (
         <div className="kiosk-overlay" role="presentation" onClick={() => setRfidOpen(false)}>

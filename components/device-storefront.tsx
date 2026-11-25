@@ -5,12 +5,18 @@ import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { Building2, MapPin, WalletCards } from "lucide-react"
 import { BrewBotLogo } from "@/components/brewbot-logo"
+import { brewbotProducts, type BrewbotProductId } from "@/lib/products"
 
-const products = [
-  { id: "coffee", name: "Coffee", price: 20, stock: 42, image: "/coffee-cup.png" },
-  { id: "masala-tea", name: "Masala Raw Tea", price: 10, stock: 42, image: "/tea-cup.png" },
-  { id: "milk-tea", name: "Milk Tea", price: 15, stock: 38, image: "/milk-tea-cup.png" },
-]
+const stockByProduct: Record<BrewbotProductId, number> = {
+  coffee: 42,
+  "masala-tea": 42,
+  "milk-tea": 38,
+}
+
+const products = brewbotProducts.map((product) => ({
+  ...product,
+  stock: stockByProduct[product.id],
+}))
 
 type DeviceStorefrontProps = {
   deviceId: string
@@ -48,7 +54,7 @@ export function DeviceStorefront({ deviceId, universityName, locationName }: Dev
             <div className="kiosk-product-image"><Image src={product.image} alt={product.name} fill sizes="64px"/></div>
             <div className="kiosk-product-info">
               <h2>{product.name}</h2>
-              <p><span>Stock: {product.stock}</span><strong>{product.price}.00 Tk</strong></p>
+              <p><span>Stock: {product.stock}</span><strong>{(product.pricePaisa / 100).toFixed(2)} Tk</strong></p>
             </div>
             <button className="kiosk-buy" onClick={() => buy(product.id)} aria-label={`Buy ${product.name}`}>Buy</button>
           </article>
