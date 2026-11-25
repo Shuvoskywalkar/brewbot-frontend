@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation"
 import { DeviceStorefront } from "@/components/device-storefront"
 import { getActiveDevice } from "@/lib/device-registry"
+import { getActiveProducts } from "@/lib/products"
 
 type DevicePageProps = {
   params: Promise<{ deviceId: string }>
@@ -12,11 +13,14 @@ export default async function DevicePage({ params }: DevicePageProps) {
 
   if (!device) notFound()
 
+  const products = await getActiveProducts()
+
   return (
     <DeviceStorefront
       deviceId={device.deviceId}
       universityName={device.universityName}
       locationName={device.locationName}
+      initialProducts={products}
     />
   )
 }

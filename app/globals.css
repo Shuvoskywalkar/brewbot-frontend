@@ -499,6 +499,7 @@ a { color: inherit; text-decoration: none; }
 .kiosk-product-info p strong { color: #111; font-size: 11px; white-space: nowrap; }
 .kiosk-buy { flex: 0 0 66px; height: 42px; border: 0; border-radius: 9px; background: #111; color: #fff; font-size: 12px; font-weight: 700; }
 .kiosk-buy:hover { background: #252930; }
+.kiosk-buy:disabled { background: #787d78; cursor: not-allowed; }
 .kiosk-ad-slot { position: fixed; right: 0; bottom: 0; left: 0; z-index: 4; width: min(100%, 460px); height: 48px; margin: 0 auto; overflow: hidden; border: 1px solid #dfe1e6; border-bottom: 0; border-radius: 8px 8px 0 0; background: #e8e9ed; color: #8b8e95; }
 .kiosk-ad-slot img { object-fit: cover; object-position: center 46%; }
 .kiosk-ad-slot span { position: relative; z-index: 1; font-size: 8px; letter-spacing: 1px; }
@@ -539,6 +540,7 @@ a { color: inherit; text-decoration: none; }
 .checkout-rfid-contact { display: flex; flex-direction: column; align-items: center; gap: 6px; margin: 14px 0; padding: 12px; border: 1px solid #eceef1; border-radius: 12px; background: #f8f9fb; color: #4a4f59; font-size: 12px; font-style: normal; line-height: 1.5; }
 .checkout-rfid-contact strong { color: #303541; font-size: 14px; }
 .checkout-rfid-contact a { display: inline-flex; align-items: center; gap: 6px; margin-top: 2px; color: #4141f5; font-weight: 700; }
+.checkout-data-message { margin: auto; padding: 24px; color: #647268; font-size: 13px; text-align: center; }
 .checkout-compact-page { min-height: 100svh; padding-bottom: 128px; background: #f0f1f5; color: #303541; }
 .checkout-compact-header { position: relative; display: flex; align-items: center; justify-content: space-between; height: 62px; padding: 0 16px; border-bottom: 1px solid #e3e4e8; background: white; }
 .checkout-compact-header > a { display: grid; place-items: center; width: 28px; height: 30px; color: #4e5360; }
@@ -763,6 +765,32 @@ a { color: inherit; text-decoration: none; }
 .ops-record-count { padding: 5px 8px; border-radius: 20px; background: #f3f6f2; color: #738075; font-size: 9px; white-space: nowrap; }
 .ops-products-card, .ops-records-card { min-height: 170px; }
 .ops-product-list { margin-top: 11px; }
+.admin-auth-page { display: grid; min-height: 100dvh; place-items: center; padding: 24px; background: #f5f7f3; color: #26372b; }
+.admin-auth-card { width: min(100%, 390px); padding: 28px; border: 1px solid var(--ops-line); border-radius: 14px; background: #fff; box-shadow: 0 14px 42px rgb(35 55 38 / 8%); }
+.admin-auth-logo { width: 105px; height: auto; margin-bottom: 22px; }
+.admin-auth-card h1 { margin: 6px 0 0; font-size: 22px; letter-spacing: -.6px; }
+.admin-auth-description { margin: 8px 0 18px; color: var(--ops-muted); font-size: 12px; line-height: 1.55; }
+.admin-auth-form { display: flex; flex-direction: column; gap: 9px; }
+.admin-auth-form label { margin-top: 4px; color: #657369; font-size: 11px; font-weight: 600; }
+.admin-auth-form input { min-height: 40px; padding: 9px 11px; border: 1px solid #dfe6df; border-radius: 8px; color: #26372b; font: inherit; font-size: 13px; }
+.admin-auth-form input:focus { outline: 2px solid #a8c8ab; outline-offset: 1px; }
+.admin-auth-form button { width: 100%; min-height: 40px; margin-top: 8px; font-size: 12px; }
+.admin-auth-form button:disabled { opacity: .65; cursor: wait; }
+.admin-auth-message { margin: 0 0 12px; padding: 9px 11px; border-radius: 7px; background: #fff4f1; color: #9b4939; font-size: 11px; line-height: 1.5; }
+.kiosk-menu-message { grid-column: 1 / -1; margin: 0; padding: 14px; color: #667468; font-size: 11px; text-align: center; }
+.ops-error { margin: 10px 0; color: #9b4939; font-size: 10px; }
+.ops-product-form { display: grid; grid-template-columns: minmax(0, 1fr); gap: 9px; margin-top: 14px; padding: 13px; border: 1px solid var(--ops-line); border-radius: 9px; background: #fafbf9; }
+.ops-product-form-heading { display: flex; align-items: center; justify-content: space-between; grid-column: 1 / -1; font-size: 11px; }
+.ops-product-form label { display: flex; flex-direction: column; gap: 5px; color: #657369; font-size: 9px; font-weight: 600; }
+.ops-product-form input:not([type="checkbox"]), .ops-product-form textarea { width: 100%; min-width: 0; padding: 8px 9px; border: 1px solid #dfe6df; border-radius: 7px; background: #fff; color: #26372b; font: inherit; font-size: 10px; }
+.ops-product-form textarea { resize: vertical; }
+.ops-product-form input:focus, .ops-product-form textarea:focus { outline: 2px solid #a8c8ab; outline-offset: 1px; }
+.ops-product-form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.ops-product-active { flex-direction: row !important; align-items: center; }
+.ops-product-active input { accent-color: #28583a; }
+.ops-product-actions, .ops-archive-confirm { display: flex; align-items: center; gap: 5px; }
+.ops-archive-action { width: 30px; padding: 0; color: #96604f; }
+.ops-product-row.is-archived { opacity: .68; }
 .ops-product-row { display: flex; align-items: center; gap: 11px; min-height: 74px; padding: 9px 0; border-top: 1px solid #eef1ed; }
 .ops-product-row > img { flex: 0 0 auto; border-radius: 9px; background: #f1f2ef; object-fit: cover; }
 .ops-product-copy { min-width: 0; flex: 1; }
@@ -854,8 +882,11 @@ a { color: inherit; text-decoration: none; }
   .ops-device-details code { font-size: 8px; }
   .ops-table th { padding-right: 8px; padding-left: 8px; font-size: 7px; }
   .ops-table td { padding: 9px 8px; font-size: 8px; }
-  .ops-product-row { gap: 8px; }
-  .ops-product-row > img { width: 48px; height: 48px; }
+  .ops-product-row { display: grid; grid-template-columns: 44px minmax(0, 1fr) auto; gap: 6px; }
+  .ops-product-row > img { grid-row: 1 / 3; width: 44px; height: 44px; }
+  .ops-product-copy { grid-column: 2; grid-row: 1; }
+  .ops-product-price { grid-column: 3; grid-row: 1; font-size: 10px; }
+  .ops-product-actions, .ops-archive-confirm { grid-column: 2 / -1; grid-row: 2; justify-content: flex-end; }
   .ops-product-edit { grid-template-columns: minmax(0, 1fr) 94px; }
   .ops-ad-layout { grid-template-columns: 1fr; gap: 14px; }
   .ops-maintainer-grid { grid-template-columns: 1fr; }

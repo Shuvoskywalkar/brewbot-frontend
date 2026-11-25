@@ -1,13 +1,54 @@
-export const brewbotProducts = [
-  { id: "coffee", name: "Coffee", pricePaisa: 2000, image: "/coffee-cup.png" },
-  { id: "masala-tea", name: "Masala Raw Tea", pricePaisa: 1000, image: "/tea-cup.png" },
-  { id: "milk-tea", name: "Milk Tea", pricePaisa: 1500, image: "/milk-tea-cup.png" },
-] as const
+import { and, asc, eq, gt } from "drizzle-orm"
+import { db } from "@/lib/db"
+import { products } from "@/lib/db/schema"
 
-export type BrewbotProductId = (typeof brewbotProducts)[number]["id"]
+export type BrewbotProduct = {
+  id: string
+  name: string
+  description: string
+  pricePaisa: number
+  image: string
+  stock: number
+  isActive: boolean
+  sortOrder: number
+}
 
-export function getBrewbotProduct(id: unknown) {
-  return typeof id === "string"
-    ? brewbotProducts.find((product) => product.id === id) ?? null
-    : null
+function toBrewbotProduct(product: typeof products.$inferSelect): BrewbotProduct {
+  return {
+    id: product.id,
+    name: product.name,
+    description: product.description,
+    pricePaisa: product.pricePaisa,
+    image: product.imageUrl,
+    stock: product.stock,
+    isActive: product.isActive,
+    sortOrder: product.sortOrder,
+  }
+}
+
+export async function getActiveProducts() {
+  const rows = await db
+    .select()
+    .from(products)
+    .where(eq(products.isActive, true))
+    .orderBy(asc(products.sortOrder), asc(products.name))
+
+  return rows.map(toBrewbotProduct)
+}
+
+export async function getAllProducts() {
+  const rows = await db.select().from(products).orderBy(asc(products.sortOrder), asc(products.name))
+  return rows.map(toBrewbotProduct)
+}
+
+export async function getBrewbotProduct(id: unknown) {
+  if (typeof id !== "string" || !id) return null
+
+  const [product] = await db
+    .select()
+    .from(products)
+    .where(and(eq(products.id, id), eq(products.isActive, true), gt(products.stock, 0)))
+    .limit(1)
+
+  return product ? toBrewbotProduct(product) : null
 }

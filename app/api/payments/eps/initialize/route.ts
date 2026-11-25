@@ -47,7 +47,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Please review the checkout details and try again." }, { status: 400 })
   }
 
-  const product = getBrewbotProduct(body.productId)
+  const product = await getBrewbotProduct(body.productId)
   const deviceId = body.deviceId === null || body.deviceId === "" ? null : body.deviceId
 
   if (

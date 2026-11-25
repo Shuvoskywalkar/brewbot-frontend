@@ -9,14 +9,15 @@ import {
   LayoutDashboard,
   Megaphone,
   Package,
-  Pencil,
   Store,
 } from "lucide-react"
+import { AdminSignOut } from "@/components/admin-sign-out"
 import { BrewBotLogo } from "@/components/brewbot-logo"
+import { ProductManager } from "@/components/product-manager"
 import { DEFAULT_DEVICE_ID, DEFAULT_DEVICE_PATH } from "@/lib/device-routes"
+import type { BrewbotProduct } from "@/lib/products"
 
 type OwnerSection = "Overview" | "Orders" | "Products" | "Advertisements"
-type Product = { id: string; name: string; price: string; image: string }
 type Order = { id: string; time: string; item: string; payment: string; total: string; status: string }
 
 const navigation: { label: OwnerSection; icon: typeof LayoutDashboard }[] = [
@@ -26,27 +27,14 @@ const navigation: { label: OwnerSection; icon: typeof LayoutDashboard }[] = [
   { label: "Advertisements", icon: Megaphone },
 ]
 
-const initialProducts: Product[] = [
-  { id: "coffee", name: "Coffee", price: "20", image: "/coffee-cup.png" },
-  { id: "masala-tea", name: "Masala Tea", price: "10", image: "/tea-cup.png" },
-  { id: "milk-tea", name: "Milk Tea", price: "15", image: "/milk-tea-cup.png" },
-]
-
 const orders: Order[] = []
 
-export function OwnerAdmin() {
+export function OwnerAdmin({ initialProducts }: { initialProducts: BrewbotProduct[] }) {
   const [section, setSection] = useState<OwnerSection>("Overview")
-  const [products, setProducts] = useState(initialProducts)
-  const [editingProduct, setEditingProduct] = useState<string | null>(null)
   const [headline, setHeadline] = useState("")
   const [campaignCopy, setCampaignCopy] = useState("")
   const [campaignImage, setCampaignImage] = useState("")
   const [feedback, setFeedback] = useState("")
-
-  function saveProduct() {
-    setEditingProduct(null)
-    setFeedback("Product changes are temporary in this session.")
-  }
 
   return (
     <main className="ops-shell">
@@ -86,6 +74,7 @@ export function OwnerAdmin() {
           <div className="ops-breadcrumb"><span>Owner workspace</span><b aria-hidden="true">/</b>{section}</div>
           <div className="ops-top-actions">
             <Link className="ops-role-switch" href="/admin/maintainer" aria-label="Switch to device maintainer"><span>Maintainer</span><ArrowRight aria-hidden="true" /></Link>
+            <AdminSignOut />
           </div>
         </header>
         <div className="ops-content">
@@ -100,21 +89,17 @@ export function OwnerAdmin() {
 
           <div className="ops-preview-note" role="note">
             <span className="ops-note-dot" aria-hidden="true" />
-            Live data is not connected. Changes are temporary and will not be saved after leaving this page.
+            {section === "Products"
+              ? "The product catalog is connected to Neon. Saved changes appear on storefronts within seconds."
+              : section === "Advertisements"
+                ? "Advertisement content is still session-only; it is not yet connected to the live catalog."
+                : "Order and device summaries are not yet connected to live operational data."}
           </div>
           {feedback && <p className="ops-feedback" role="status">{feedback}</p>}
 
           {section === "Overview" && <Overview onOpenOrders={() => setSection("Orders")} />}
           {section === "Orders" && <OrderRecords />}
-          {section === "Products" && (
-            <ProductEditor
-              products={products}
-              editingProduct={editingProduct}
-              setEditingProduct={setEditingProduct}
-              setProducts={setProducts}
-              onSave={saveProduct}
-            />
-          )}
+          {section === "Products" && <ProductManager initialProducts={initialProducts} />}
           {section === "Advertisements" && (
             <AdvertisementEditor
               headline={headline}
@@ -196,52 +181,6 @@ function OrderTable({ rows }: { rows: typeof orders }) {
         ))}</tbody>
       </table>
     </div>
-  )
-}
-
-function ProductEditor({
-  products,
-  editingProduct,
-  setEditingProduct,
-  setProducts,
-  onSave,
-}: {
-  products: Product[]
-  editingProduct: string | null
-  setEditingProduct: (id: string | null) => void
-  setProducts: React.Dispatch<React.SetStateAction<Product[]>>
-  onSave: () => void
-}) {
-  const [imageFeedback, setImageFeedback] = useState("")
-
-  return (
-    <section className="ops-card ops-products-card" aria-labelledby="products-heading">
-      <div className="ops-card-heading">
-        <div><p className="ops-eyebrow">MENU CONTENT</p><h2 id="products-heading">Products</h2><p>Update names, prices, and photos shown on the kiosk.</p></div>
-      </div>
-      <div className="ops-product-list">
-        {products.map((product) => (
-          <article className="ops-product-row" key={product.id}>
-            <Image src={product.image} alt={`${product.name} product`} width={58} height={58} unoptimized />
-            {editingProduct === product.id ? (
-              <form className="ops-product-edit" onSubmit={(event) => { event.preventDefault(); onSave() }}>
-                <label>Product name<input value={product.name} onChange={(event) => setProducts((current) => current.map((item) => item.id === product.id ? { ...item, name: event.target.value } : item))} required /></label>
-                <label>Price (Tk)<input type="number" inputMode="decimal" min="0.01" step="0.01" value={product.price} onChange={(event) => setProducts((current) => current.map((item) => item.id === product.id ? { ...item, price: event.target.value } : item))} required /></label>
-                <label className="ops-full-field">Product photo<input type="file" accept="image/*" onChange={(event) => { const file = event.target.files?.[0]; if (file) readImagePreview(file, (image) => { setProducts((current) => current.map((item) => item.id === product.id ? { ...item, image } : item)); setImageFeedback("") }, setImageFeedback) }} /></label>
-                {imageFeedback && <p className="ops-file-feedback" role="status">{imageFeedback}</p>}
-                <div className="ops-edit-actions"><button className="ops-button-primary" type="submit">Save changes</button><button className="ops-button-quiet" type="button" onClick={() => setEditingProduct(null)}>Cancel</button></div>
-              </form>
-            ) : (
-              <>
-                <div className="ops-product-copy"><strong>{product.name}</strong><span>Stock data unavailable</span></div>
-                <strong className="ops-product-price">Tk {product.price}</strong>
-                <button className="ops-icon-action" type="button" aria-label={`Edit ${product.name}`} onClick={() => setEditingProduct(product.id)}><Pencil aria-hidden="true" /> Edit</button>
-              </>
-            )}
-          </article>
-        ))}
-      </div>
-    </section>
   )
 }
 
