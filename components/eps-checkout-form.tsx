@@ -20,7 +20,8 @@ export function CheckoutPaymentButton({ productId, deviceId }: CheckoutPaymentBu
   async function startPayment() {
     if (isSubmitting || paymentUrl) return
 
-    const gatewayWindow = window.open("about:blank", "_blank")
+    const isEmbedded = window.self !== window.top
+    const gatewayWindow = isEmbedded ? window.open("about:blank", "_blank") : null
     if (gatewayWindow) gatewayWindow.opener = null
 
     setIsSubmitting(true)
@@ -38,6 +39,11 @@ export function CheckoutPaymentButton({ productId, deviceId }: CheckoutPaymentBu
         gatewayWindow?.close()
         setMessage(result.error ?? "We couldn't open the payment gateway. Please try again.")
         setIsSubmitting(false)
+        return
+      }
+
+      if (!isEmbedded) {
+        window.location.assign(result.redirectUrl)
         return
       }
 

@@ -983,8 +983,19 @@ body:has(.checkout-compact-page) { background: #0b0b0b; }
 .checkout-result-paid h1 { color: #166534; }
 .checkout-result-pending h1 { color: #854d0e; }
 .checkout-result-failed h1, .checkout-result-cancelled h1 { color: #9f1239; }
-.checkout-result-note { color: #555; font-size: 12px; }
-.checkout-result-link { display: flex; align-items: center; justify-content: center; min-height: 46px; margin-top: 18px; border-radius: 12px; background: #111; color: white; font-size: 14px; font-weight: 700; text-decoration: none; }
+ .checkout-result-note { color: #555; font-size: 12px; }
+ .checkout-result-details { display: grid; margin: 14px 0 0; padding: 0; border-top: 1px solid #e6e6e6; }
+ .checkout-result-details > div { display: grid; grid-template-columns: minmax(72px, 0.65fr) minmax(0, 1.35fr); gap: 8px; padding: 8px 0; border-bottom: 1px solid #e6e6e6; font-size: 12px; line-height: 1.4; }
+ .checkout-result-details dt { color: #666; }
+ .checkout-result-details dd { margin: 0; color: #111; font-weight: 600; text-align: right; overflow-wrap: anywhere; }
+ .checkout-result-access { display: grid; gap: 8px; margin-top: 14px; padding: 14px; border: 1px solid #bbf7d0; border-radius: 14px; background: #f0fdf4; color: #14532d; }
+ .checkout-result-access-eyebrow { margin: 0; color: #166534; font-size: 11px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; }
+ .checkout-result-access h2 { margin: 0; color: #14532d; font-size: 16px; line-height: 1.35; }
+ .checkout-result-access-copy { margin: 0; color: #28543a; font-size: 12px; line-height: 1.5; }
+ .checkout-result-countdown { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-top: 10px; border-top: 1px solid #bbf7d0; color: #14532d; font-size: 12px; }
+ .checkout-result-countdown strong { font-size: 21px; font-variant-numeric: tabular-nums; }
+ .checkout-result-link { display: flex; align-items: center; justify-content: center; min-height: 46px; margin-top: 18px; border-radius: 12px; background: #111; color: white; font-size: 14px; font-weight: 700; text-decoration: none; }
+
 @media (min-width: 460px) {
   .eps-fields { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .eps-field:nth-child(1), .eps-field:nth-child(2), .eps-field:nth-child(4) { grid-column: 1 / -1; }
