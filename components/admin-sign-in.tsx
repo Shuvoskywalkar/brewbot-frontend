@@ -1,14 +1,21 @@
 "use client"
 
 import { useState, type FormEvent } from "react"
+import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { BrewBotLogo } from "@/components/brewbot-logo"
 import { authClient } from "@/lib/auth/client"
 
-export function AdminSignIn({ denied = false }: { denied?: boolean }) {
+export function AdminSignIn({ denied = false, verified = false }: { denied?: boolean; verified?: boolean }) {
   const router = useRouter()
   const [busy, setBusy] = useState(false)
-  const [message, setMessage] = useState(denied ? "This account is not authorized for the owner workspace." : "")
+  const [message, setMessage] = useState(
+    denied
+      ? "This account is not authorized for the owner workspace."
+      : verified
+        ? "Email verified. Sign in with your new password."
+        : "",
+  )
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -53,6 +60,7 @@ export function AdminSignIn({ denied = false }: { denied?: boolean }) {
           <input id="admin-password" name="password" type="password" autoComplete="current-password" required />
           <button className="ops-button-primary" type="submit" disabled={busy}>{busy ? "Signing in…" : "Sign in"}</button>
         </form>
+        <p className="admin-auth-alternate">New owner? <Link href="/admin/sign-up">Create an account</Link></p>
       </section>
     </main>
   )

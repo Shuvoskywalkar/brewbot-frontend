@@ -10,7 +10,7 @@ export async function getAdminAccess() {
 
   return {
     user,
-    authorized: Boolean(user?.email && allowedEmails.includes(user.email.toLowerCase())),
+    authorized: Boolean(user?.email && user.emailVerified && allowedEmails.includes(user.email.toLowerCase())),
   }
 }
 
