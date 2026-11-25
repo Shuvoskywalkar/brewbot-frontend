@@ -26,11 +26,13 @@ export function DeviceStorefront({ deviceId, universityName, locationName }: Dev
     <main className="kiosk-screen">
       <section className="kiosk-location" aria-label="Device location">
         <div className="kiosk-location-header">
+          <div className="kiosk-location-details">
+            <div className="kiosk-location-title"><Building2 className="kiosk-building-icon" aria-hidden="true"/><h1>{universityName}</h1></div>
+            <p className="kiosk-hall"><MapPin size={17} fill="currentColor"/> {locationName}</p>
+            <p className="kiosk-last-stock">Last Stock: 24 Nov, 09:45 PM</p>
+          </div>
           <BrewBotLogo className="kiosk-brand" />
         </div>
-        <div className="kiosk-location-title"><Building2 className="kiosk-building-icon" aria-hidden="true"/><h1>{universityName}</h1></div>
-        <p className="kiosk-hall"><MapPin size={17} fill="currentColor"/> {locationName}</p>
-        <p className="kiosk-last-stock">Last Stock: 24 Nov, 09:45 PM</p>
         <span className="kiosk-device-id">{deviceId}</span>
       </section>
 
