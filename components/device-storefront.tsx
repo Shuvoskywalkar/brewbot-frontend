@@ -10,9 +10,15 @@ const products = [
   { id: "milk-tea", name: "Milk Tea", price: 15, stock: 38, image: "/milk-tea-cup.png" },
 ]
 
-export function DeviceStorefront({ deviceId = "APD260209001" }: { deviceId?: string }) {
+type DeviceStorefrontProps = {
+  deviceId: string
+  universityName: string
+  locationName: string
+}
+
+export function DeviceStorefront({ deviceId, universityName, locationName }: DeviceStorefrontProps) {
   const router = useRouter()
-  const buy = (id: string) => router.push(`/checkout?product=${id}`)
+  const buy = (id: string) => router.push(`/checkout?product=${encodeURIComponent(id)}&deviceId=${encodeURIComponent(deviceId)}`)
 
   return (
     <main className="kiosk-screen">
@@ -27,8 +33,8 @@ export function DeviceStorefront({ deviceId = "APD260209001" }: { deviceId?: str
           </svg>
           <span className="kiosk-brand-word">Brew<span>Bot</span></span>
         </span>
-        <div className="kiosk-location-title"><Building2 className="kiosk-building-icon" aria-hidden="true"/><h1>Dhaka University</h1></div>
-        <p className="kiosk-hall"><MapPin size={17} fill="currentColor"/> Jagannath Hall</p>
+        <div className="kiosk-location-title"><Building2 className="kiosk-building-icon" aria-hidden="true"/><h1>{universityName}</h1></div>
+        <p className="kiosk-hall"><MapPin size={17} fill="currentColor"/> {locationName}</p>
         <p className="kiosk-last-stock">Last Stock: 24 Nov, 09:45 PM</p>
         <span className="kiosk-device-id">{deviceId}</span>
       </section>

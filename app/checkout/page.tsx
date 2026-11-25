@@ -16,6 +16,10 @@ function CheckoutScreen() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const selectedId = products.some((product) => product.id === searchParams.get("product")) ? searchParams.get("product")! : "masala-tea"
+  const requestedDeviceId = searchParams.get("deviceId")
+  const deviceHomePath = requestedDeviceId && /^[A-Z0-9_-]{1,64}$/.test(requestedDeviceId)
+    ? `/${encodeURIComponent(requestedDeviceId)}`
+    : "/"
   const [seconds, setSeconds] = useState(45)
   const [message, setMessage] = useState("")
   const [rfidOpen, setRfidOpen] = useState(false)
@@ -26,7 +30,7 @@ function CheckoutScreen() {
       setSeconds((remaining) => {
         if (remaining <= 1) {
           window.clearInterval(timerId)
-          router.replace("/")
+          router.replace(deviceHomePath)
           return 0
         }
 
@@ -35,12 +39,12 @@ function CheckoutScreen() {
     }, 1000)
 
     return () => window.clearInterval(timerId)
-  }, [router])
+  }, [router, deviceHomePath])
 
   return (
     <main className="checkout-compact-page">
       <header className="checkout-compact-header">
-        <Link href="/" aria-label="Back to products"><ArrowLeft size={20} /></Link>
+        <Link href={deviceHomePath} aria-label="Back to products"><ArrowLeft size={20} /></Link>
         <h1>Checkout</h1>
         <span className="checkout-countdown" role="timer" aria-label={`${seconds} seconds remaining`}><Clock3 size={16} /> {seconds}s</span>
       </header>

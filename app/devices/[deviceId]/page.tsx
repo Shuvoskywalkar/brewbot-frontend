@@ -1,6 +1,10 @@
-import { DeviceStorefront } from "@/components/device-storefront"
+import { redirect } from "next/navigation"
 
-export default async function DevicePage({ params }: { params: Promise<{ deviceId: string }> }) {
+type LegacyDevicePageProps = {
+  params: Promise<{ deviceId: string }>
+}
+
+export default async function LegacyDevicePage({ params }: LegacyDevicePageProps) {
   const { deviceId } = await params
-  return <DeviceStorefront deviceId={deviceId} />
+  redirect(`/${encodeURIComponent(deviceId)}`)
 }
