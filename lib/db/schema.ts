@@ -1,4 +1,5 @@
-import { boolean, integer, pgTable, text, timestamp } from "drizzle-orm/pg-core"
+import { sql } from "drizzle-orm"
+import { boolean, integer, pgTable, text, timestamp, uniqueIndex, uuid } from "drizzle-orm/pg-core"
 
 export const devices = pgTable("devices", {
   deviceId: text("device_id").primaryKey(),
@@ -37,3 +38,15 @@ export const paymentAttempts = pgTable("payment_attempts", {
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
   paidAt: timestamp("paid_at", { withTimezone: true }),
 })
+
+export const campaigns = pgTable("campaigns", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  headline: text("headline").notNull(),
+  supportingText: text("supporting_text").notNull().default(""),
+  artworkUrl: text("artwork_url"),
+  isActive: boolean("is_active").notNull().default(false),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+}, (table) => [
+  uniqueIndex("campaigns_one_active_idx").on(table.isActive).where(sql`${table.isActive} = true`),
+])

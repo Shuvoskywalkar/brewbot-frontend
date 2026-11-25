@@ -6,9 +6,11 @@ import { useRouter } from "next/navigation"
 import { Building2, MapPin, WalletCards } from "lucide-react"
 import useSWR from "swr"
 import { BrewBotLogo } from "@/components/brewbot-logo"
+import type { BrewbotCampaign } from "@/lib/campaigns"
 import type { BrewbotProduct } from "@/lib/products"
 
 type ProductResponse = { products: BrewbotProduct[] }
+type CampaignResponse = { campaign: BrewbotCampaign | null }
 
 async function fetchProducts(url: string): Promise<ProductResponse> {
   const response = await fetch(url, { cache: "no-store" })
@@ -16,21 +18,34 @@ async function fetchProducts(url: string): Promise<ProductResponse> {
   return response.json() as Promise<ProductResponse>
 }
 
+async function fetchCampaign(url: string): Promise<CampaignResponse> {
+  const response = await fetch(url, { cache: "no-store" })
+  if (!response.ok) throw new Error("The campaign could not be loaded.")
+  return response.json() as Promise<CampaignResponse>
+}
+
 type DeviceStorefrontProps = {
   deviceId: string
   universityName: string
   locationName: string
   initialProducts: BrewbotProduct[]
+  initialCampaign: BrewbotCampaign | null
 }
 
-export function DeviceStorefront({ deviceId, universityName, locationName, initialProducts }: DeviceStorefrontProps) {
+export function DeviceStorefront({ deviceId, universityName, locationName, initialProducts, initialCampaign }: DeviceStorefrontProps) {
   const router = useRouter()
   const { data, error } = useSWR<ProductResponse>("/api/products", fetchProducts, {
     fallbackData: { products: initialProducts },
     refreshInterval: 5000,
     revalidateOnFocus: true,
   })
+  const { data: campaignData } = useSWR<CampaignResponse>("/api/campaign", fetchCampaign, {
+    fallbackData: { campaign: initialCampaign },
+    refreshInterval: 5000,
+    revalidateOnFocus: true,
+  })
   const products = data?.products ?? []
+  const campaign = campaignData?.campaign ?? null
   const displayUniversityName = universityName.trim() === "Dhaka University" ? "University of Dhaka" : universityName
   const buy = (id: string) => router.push(`/checkout?product=${encodeURIComponent(id)}&deviceId=${encodeURIComponent(deviceId)}`)
 
@@ -70,8 +85,23 @@ export function DeviceStorefront({ deviceId, universityName, locationName, initi
         ))}
       </section>
 
-      <aside className="kiosk-ad-slot" aria-label="Advertisement">
-        <Image src="/blm-ad-banner.png" alt="Raised hands silhouetted against a light background" fill sizes="(max-width: 420px) 100vw, 400px" />
+      <aside className={`kiosk-ad-slot${campaign ? " has-campaign" : ""}`} aria-label={campaign ? `Advertisement: ${campaign.headline}` : "Advertisement"}>
+        {campaign ? (
+          <>
+            {campaign.artworkUrl && (
+              <div className="kiosk-ad-artwork">
+                <Image src={campaign.artworkUrl} alt={`${campaign.headline} campaign artwork`} fill sizes="96px" unoptimized />
+              </div>
+            )}
+            <div className="kiosk-ad-copy">
+              <span>FEATURED CAMPAIGN</span>
+              <strong>{campaign.headline}</strong>
+              {campaign.supportingText && <p>{campaign.supportingText}</p>}
+            </div>
+          </>
+        ) : (
+          <Image src="/blm-ad-banner.png" alt="Raised hands silhouetted against a light background" fill sizes="(max-width: 420px) 100vw, 400px" />
+        )}
       </aside>
 
     </main>
