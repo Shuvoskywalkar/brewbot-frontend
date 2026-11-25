@@ -31,7 +31,12 @@ export function DeviceStorefront({ deviceId, universityName, locationName }: Dev
             <p className="kiosk-hall"><MapPin size={17} fill="currentColor"/> {locationName}</p>
             <p className="kiosk-last-stock">Last Stock: 24 Nov, 09:45 PM</p>
           </div>
-          <BrewBotLogo className="kiosk-brand" />
+          <div className="kiosk-brand-stack">
+            <BrewBotLogo className="kiosk-brand" />
+            <Link className="kiosk-wallet-fab" href={`/recharge?deviceId=${encodeURIComponent(deviceId)}`} aria-label="Open RFID wallet">
+              <WalletCards aria-hidden="true" />
+            </Link>
+          </div>
         </div>
         <span className="kiosk-device-id">{deviceId}</span>
       </section>
@@ -53,9 +58,6 @@ export function DeviceStorefront({ deviceId, universityName, locationName }: Dev
         <Image src="/blm-ad-banner.png" alt="Raised hands silhouetted against a light background" fill sizes="(max-width: 420px) 100vw, 400px" />
       </aside>
 
-      <Link className="kiosk-wallet-fab" href={`/recharge?deviceId=${encodeURIComponent(deviceId)}`} aria-label="Open RFID wallet">
-        <WalletCards aria-hidden="true" />
-      </Link>
     </main>
   )
 }
