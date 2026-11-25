@@ -16,11 +16,25 @@ function createMerchantTransactionId() {
   return `${Date.now()}${randomInt(0, 1_000_000_000).toString().padStart(9, "0")}`
 }
 
+function getPublicRequestOrigin(request: NextRequest) {
+  const forwardedHost = request.headers.get("x-forwarded-host")?.split(",")[0]?.trim()
+  const forwardedProtocol = request.headers.get("x-forwarded-proto")?.split(",")[0]?.trim()
+  const host = forwardedHost || request.headers.get("host")
+  const protocol = forwardedProtocol || request.nextUrl.protocol.replace(":", "")
+
+  if (!host || (protocol !== "http" && protocol !== "https")) {
+    return request.nextUrl.origin
+  }
+
+  return new URL(`${protocol}://${host}`).origin
+}
+
 export async function POST(request: NextRequest) {
+  const publicOrigin = getPublicRequestOrigin(request)
   const origin = request.headers.get("origin")
   if (origin) {
     try {
-      if (new URL(origin).origin !== request.nextUrl.origin) {
+      if (new URL(origin).origin !== publicOrigin) {
         return NextResponse.json({ error: "Invalid checkout origin." }, { status: 403 })
       }
     } catch {
@@ -69,7 +83,7 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const callbackUrl = new URL("/api/payments/eps/return", request.nextUrl.origin)
+    const callbackUrl = new URL("/api/payments/eps/return", publicOrigin)
     const successUrl = new URL(callbackUrl)
     successUrl.searchParams.set("callbackOutcome", "success")
     const failUrl = new URL(callbackUrl)
