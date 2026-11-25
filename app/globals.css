@@ -478,9 +478,9 @@ a { color: inherit; text-decoration: none; }
 }
 
 /* Compact, phone-first customer kiosk */
-.kiosk-screen { position: relative; width: 100%; max-width: 720px; min-height: 100svh; margin: 0 auto; padding: 10px 10px 58px; overflow-x: hidden; background: #f0f1f5; color: #303541; }
+.kiosk-screen { position: relative; width: 100%; max-width: 720px; min-height: 100svh; margin: 0 auto; padding: 10px 10px 78px; overflow-x: hidden; background: #f0f1f5; color: #303541; }
 .kiosk-location { position: relative; min-height: 104px; margin-bottom: 10px; padding: 13px 14px; border-radius: 10px; background: #34383e; color: #fff; box-shadow: 0 5px 9px #24283120; }
-.kiosk-location-header { display: flex; align-items: center; justify-content: flex-start; gap: 8px; margin-bottom: 11px; }
+.kiosk-location-header { display: flex; align-items: center; justify-content: flex-end; gap: 8px; margin-bottom: 11px; }
 .kiosk-brand { display: inline-flex; flex: 0 0 auto; align-items: center; gap: 6px; color: #fff; }
 .kiosk-location-title { display: flex; align-items: center; gap: 10px; }
 .kiosk-building-icon { width: 26px; height: 30px; color: #fff; stroke-width: 2.5; }
@@ -501,13 +501,14 @@ a { color: inherit; text-decoration: none; }
 .kiosk-add { background: #1674ed; }
 .kiosk-buy { background: #18885d; }
 .kiosk-product-actions button:active { filter: brightness(.92); }
-.kiosk-ad-slot { display: flex; align-items: center; justify-content: center; height: 30px; margin-top: 9px; overflow: hidden; border: 1px solid #dfe1e6; border-radius: 6px; background: #e8e9ed; color: #8b8e95; }
-.kiosk-ad-slot span { font-size: 8px; letter-spacing: 1px; }
-.kiosk-dock { position: fixed; right: 10px; bottom: 12px; z-index: 5; display: flex; flex-direction: column; align-items: flex-end; gap: 8px; }
-.kiosk-dock button { display: flex; align-items: center; justify-content: center; gap: 8px; min-height: 42px; padding: 0 16px; border: 0; border-radius: 24px; color: white; box-shadow: 0 5px 16px #171d2b30; font-size: 13px; font-weight: 700; }
-.kiosk-wallet { background: #303541; }
-.kiosk-cart { min-width: 125px; background: #26a94c; }
-.kiosk-cart span { display: grid; place-items: center; width: 21px; height: 21px; border-radius: 50%; background: #e13c4c; font-size: 11px; }
+.kiosk-buy { display: block; width: calc(100% - 16px); height: 32px; margin: 0 8px 8px; border: 0; border-radius: 7px; background: #34383e; color: #fff; font-size: 11px; font-weight: 650; }
+.kiosk-buy:hover { background: #252930; }
+.kiosk-ad-slot { position: relative; display: flex; align-items: center; justify-content: center; min-height: 96px; margin-top: 10px; overflow: hidden; border: 1px solid #dfe1e6; border-radius: 8px; background: #e8e9ed; color: #8b8e95; }
+.kiosk-ad-slot img { object-fit: cover; }
+.kiosk-ad-slot span { position: relative; z-index: 1; font-size: 8px; letter-spacing: 1px; }
+.kiosk-wallet-fab { position: fixed; right: max(16px, calc((100vw - 700px) / 2)); bottom: max(16px, env(safe-area-inset-bottom)); z-index: 5; display: grid; place-items: center; width: 48px; height: 48px; border: 1px solid #ffffff70; border-radius: 50%; background: #34383e; color: #fff; box-shadow: 0 5px 16px #171d2b30; }
+.kiosk-wallet-fab:hover { background: #252930; }
+.kiosk-wallet-fab svg { width: 21px; height: 21px; }
 .kiosk-overlay { position: fixed; inset: 0; z-index: 20; display: grid; place-items: center; padding: 14px; background: #11172080; }
 .kiosk-modal { position: relative; width: min(100%, 400px); max-height: 85svh; overflow-y: auto; padding: 22px 18px 18px; border-radius: 16px; background: white; box-shadow: 0 12px 40px #0003; }
 .kiosk-modal h2 { margin: 0 0 15px; font-size: 20px; }
@@ -668,6 +669,9 @@ a { color: inherit; text-decoration: none; }
 .kiosk-brand .brewbot-eye { fill: #dedede; }
 .kiosk-brand .brewbot-word { font-size: 14px; letter-spacing: -.45px; }
 .kiosk-brand .brewbot-word > span { color: #dedede; }
+.kiosk-screen { padding-bottom: 88px; }
+.kiosk-wallet-fab { right: max(16px, calc((100vw - 420px) / 2 + 16px)); }
+.kiosk-wallet-fab:focus-visible { outline: 3px solid #4b6578; outline-offset: 3px; }
 
 /* Owner and device-maintainer workspaces */
 .ops-shell { --ops-ink: #20352a; --ops-muted: #758078; --ops-line: #e4e9e2; --ops-green: #28583a; display: flex; min-height: 100vh; background: #f6f8f5; color: var(--ops-ink); }
