@@ -21,6 +21,23 @@ import type { BrewbotProduct } from "@/lib/products"
 
 type OwnerSection = "Overview" | "Orders" | "Products" | "Advertisements"
 type Order = { id: string; time: string; item: string; payment: string; total: string; status: string }
+type AdminOrder = {
+  id: string
+  createdAt: string
+  productName: string
+  status: string
+  amountPaisa: number
+  paymentReference: string | null
+  deviceId: string | null
+  locationName: string | null
+}
+type ActiveDevice = { deviceId: string; universityName: string; locationName: string }
+type AdminDashboardResponse = {
+  devices: ActiveDevice[]
+  orders: AdminOrder[]
+  ordersToday: number
+  paidTotalPaisa: number
+}
 
 const navigation: { label: OwnerSection; icon: typeof LayoutDashboard }[] = [
   { label: "Overview", icon: LayoutDashboard },
@@ -29,11 +46,30 @@ const navigation: { label: OwnerSection; icon: typeof LayoutDashboard }[] = [
   { label: "Advertisements", icon: Megaphone },
 ]
 
-const orders: Order[] = []
+async function fetchAdminDashboard(url: string): Promise<AdminDashboardResponse> {
+  const response = await fetch(url, { cache: "no-store" })
+  if (!response.ok) throw new Error("Live admin data could not be loaded.")
+  return response.json() as Promise<AdminDashboardResponse>
+}
+
+function toOrderRow(order: AdminOrder): Order {
+  return {
+    id: order.id,
+    time: new Intl.DateTimeFormat("en-BD", { dateStyle: "medium", timeStyle: "short" }).format(new Date(order.createdAt)),
+    item: order.productName,
+    payment: "EPS",
+    total: `Tk ${(order.amountPaisa / 100).toFixed(2)}`,
+    status: order.status.charAt(0).toUpperCase() + order.status.slice(1),
+  }
+}
 
 export function OwnerAdmin({ initialProducts, initialCampaign }: { initialProducts: BrewbotProduct[]; initialCampaign: BrewbotCampaign | null }) {
   const [section, setSection] = useState<OwnerSection>("Overview")
   const [feedback, setFeedback] = useState("")
+  const { data: dashboard, error: dashboardError } = useSWR<AdminDashboardResponse>("/api/admin/dashboard", fetchAdminDashboard, {
+    refreshInterval: 10000,
+    revalidateOnFocus: true,
+  })
 
   return (
     <main className="ops-shell">
@@ -73,7 +109,7 @@ export function OwnerAdmin({ initialProducts, initialCampaign }: { initialProduc
           <div className="ops-breadcrumb"><span>Owner workspace</span><b aria-hidden="true">/</b>{section}</div>
           <div className="ops-top-actions">
             <Link className="ops-role-switch" href="/admin/maintainer" aria-label="Switch to device maintainer"><span>Maintainer</span><ArrowRight aria-hidden="true" /></Link>
-            <AdminSignOut />
+            {process.env.NODE_ENV !== "development" && <AdminSignOut />}
           </div>
         </header>
         <div className="ops-content">
@@ -88,7 +124,9 @@ export function OwnerAdmin({ initialProducts, initialCampaign }: { initialProduc
 
           <div className="ops-preview-note" role="note">
             <span className="ops-note-dot" aria-hidden="true" />
-            {section === "Products"
+            {process.env.NODE_ENV === "development"
+              ? "Development preview access is enabled without sign-in. Production admin access remains protected."
+              : section === "Products"
               ? "The product catalog is connected to Neon. Saved changes appear on storefronts within seconds."
               : section === "Advertisements"
                 ? "Campaigns save to Neon and appear on every storefront within seconds."
@@ -96,8 +134,8 @@ export function OwnerAdmin({ initialProducts, initialCampaign }: { initialProduc
           </div>
           {feedback && <p className="ops-feedback" role="status">{feedback}</p>}
 
-          {section === "Overview" && <Overview onOpenOrders={() => setSection("Orders")} />}
-          {section === "Orders" && <OrderRecords />}
+          {section === "Overview" && <Overview dashboard={dashboard} error={dashboardError?.message} onOpenOrders={() => setSection("Orders")} />}
+          {section === "Orders" && <OrderRecords dashboard={dashboard} error={dashboardError?.message} />}
           {section === "Products" && <ProductManager initialProducts={initialProducts} />}
           {section === "Advertisements" && (
             <AdvertisementEditor initialCampaign={initialCampaign} onFeedback={setFeedback} />
@@ -108,25 +146,31 @@ export function OwnerAdmin({ initialProducts, initialCampaign }: { initialProduc
   )
 }
 
-function Overview({ onOpenOrders }: { onOpenOrders: () => void }) {
+function Overview({ dashboard, error, onOpenOrders }: { dashboard?: AdminDashboardResponse; error?: string; onOpenOrders: () => void }) {
+  const primaryDevice = dashboard?.devices[0]
+  const recentOrders = (dashboard?.orders ?? []).slice(0, 3).map(toOrderRow)
+
   return (
     <>
+      {error && <p className="ops-error" role="alert">{error}</p>}
       <div className="ops-stat-grid" aria-label="Order summary">
-        <SummaryCard label="Devices online" value="—" detail="Device status unavailable" />
-        <SummaryCard label="Orders today" value="—" detail="No order data available" />
-        <SummaryCard label="Order total" value="—" detail="No order data available" />
+        <SummaryCard label="Devices online" value={dashboard ? String(dashboard.devices.length) : "—"} detail={dashboard ? "Active registered kiosks" : "Loading device data…"} />
+        <SummaryCard label="Orders today" value={dashboard ? String(dashboard.ordersToday) : "—"} detail={dashboard ? "Payment attempts today" : "Loading order data…"} />
+        <SummaryCard label="Paid today" value={dashboard ? `Tk ${(dashboard.paidTotalPaisa / 100).toFixed(2)}` : "—"} detail={dashboard ? "Confirmed payments" : "Loading payment data…"} />
       </div>
 
       <section className="ops-card ops-device-card" aria-labelledby="device-summary-heading">
         <div className="ops-card-heading">
-          <div><p className="ops-eyebrow">DEVICE SUMMARY</p><h2 id="device-summary-heading">Your kiosk</h2></div>
-          <span className="ops-status">Status unavailable</span>
+          <div><p className="ops-eyebrow">DEVICE SUMMARY</p><h2 id="device-summary-heading">Registered kiosks</h2></div>
+          <span className="ops-status">{dashboard ? `${dashboard.devices.length} active` : "Loading…"}</span>
         </div>
-        <div className="ops-device-details">
-          <span className="ops-device-icon"><Store aria-hidden="true" /></span>
-          <div><strong>Jagannath Hall</strong><span>University of Dhaka · Main entrance</span></div>
-          <code>{DEFAULT_DEVICE_ID}</code>
-        </div>
+        {primaryDevice ? (
+          <div className="ops-device-details">
+            <span className="ops-device-icon"><Store aria-hidden="true" /></span>
+            <div><strong>{primaryDevice.locationName}</strong><span>{primaryDevice.universityName}</span></div>
+            <code>{primaryDevice.deviceId}</code>
+          </div>
+        ) : <p className="ops-empty">{dashboard ? "No active kiosks are registered." : "Loading registered devices…"}</p>}
       </section>
 
       <section className="ops-card ops-orders-card" aria-labelledby="recent-orders-heading">
@@ -134,7 +178,7 @@ function Overview({ onOpenOrders }: { onOpenOrders: () => void }) {
           <div><p className="ops-eyebrow">ORDER RECORDS</p><h2 id="recent-orders-heading">Recent orders</h2></div>
           <button className="ops-text-button" type="button" onClick={onOpenOrders}>View all <ArrowRight aria-hidden="true" /></button>
         </div>
-        <OrderTable rows={orders.slice(0, 3)} />
+        <OrderTable rows={recentOrders} emptyMessage={dashboard ? "No order records are available." : "Loading recent orders…"} />
       </section>
     </>
   )
@@ -144,25 +188,28 @@ function SummaryCard({ label, value, detail }: { label: string; value: string; d
   return <article className="ops-stat-card"><span>{label}</span><strong>{value}</strong><small>{detail}</small></article>
 }
 
-function OrderRecords() {
+function OrderRecords({ dashboard, error }: { dashboard?: AdminDashboardResponse; error?: string }) {
+  const orders = (dashboard?.orders ?? []).map(toOrderRow)
+
   return (
     <section className="ops-card ops-records-card" aria-labelledby="order-records-heading">
       <div className="ops-card-heading">
         <div><p className="ops-eyebrow">ORDER HISTORY</p><h2 id="order-records-heading">Recent records</h2></div>
-        <span className="ops-record-count">{orders.length} records</span>
+        <span className="ops-record-count">{dashboard ? `${orders.length}${orders.length === 100 ? "+" : ""} records` : "Loading…"}</span>
       </div>
-      <OrderTable rows={orders} />
+      {error && <p className="ops-error" role="alert">{error}</p>}
+      <OrderTable rows={orders} emptyMessage={dashboard ? "No order records are available." : "Loading order history…"} />
     </section>
   )
 }
 
-function OrderTable({ rows }: { rows: typeof orders }) {
+function OrderTable({ rows, emptyMessage }: { rows: Order[]; emptyMessage: string }) {
   return (
     <div className="ops-table-scroll">
       <table className="ops-table">
         <thead><tr><th scope="col">ORDER</th><th scope="col">TIME</th><th scope="col">ITEM</th><th scope="col">PAYMENT</th><th scope="col">TOTAL</th><th scope="col">STATUS</th></tr></thead>
         <tbody>{rows.length === 0 ? (
-          <tr><td className="ops-empty-table" colSpan={6}>No order records are available.</td></tr>
+          <tr><td className="ops-empty-table" colSpan={6}>{emptyMessage}</td></tr>
         ) : rows.map((order) => (
           <tr key={order.id}>
             <td>{order.id}</td><td>{order.time}</td><td>{order.item}</td><td>{order.payment}</td><td>{order.total}</td>
