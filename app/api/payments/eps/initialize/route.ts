@@ -17,6 +17,18 @@ function createMerchantTransactionId() {
 }
 
 function getPublicRequestOrigin(request: NextRequest) {
+  const browserOrigin = request.headers.get("origin")
+  if (request.headers.get("sec-fetch-site") === "same-origin" && browserOrigin) {
+    try {
+      const parsedOrigin = new URL(browserOrigin)
+      if (parsedOrigin.protocol === "https:" || parsedOrigin.protocol === "http:") {
+        return parsedOrigin.origin
+      }
+    } catch {
+      // Fall back to the proxy-provided host when the browser origin is opaque.
+    }
+  }
+
   const forwardedHost = request.headers.get("x-forwarded-host")?.split(",")[0]?.trim()
   const forwardedProtocol = request.headers.get("x-forwarded-proto")?.split(",")[0]?.trim()
   const host = forwardedHost || request.headers.get("host")
@@ -29,17 +41,25 @@ function getPublicRequestOrigin(request: NextRequest) {
   return new URL(`${protocol}://${host}`).origin
 }
 
+function hasValidCheckoutOrigin(request: NextRequest, publicOrigin: string) {
+  const fetchSite = request.headers.get("sec-fetch-site")
+  if (fetchSite === "cross-site") return false
+
+  const origin = request.headers.get("origin")
+  if (!origin || origin === "null") return true
+
+  try {
+    const parsedOrigin = new URL(origin)
+    return parsedOrigin.origin === publicOrigin || fetchSite === "same-origin"
+  } catch {
+    return false
+  }
+}
+
 export async function POST(request: NextRequest) {
   const publicOrigin = getPublicRequestOrigin(request)
-  const origin = request.headers.get("origin")
-  if (origin) {
-    try {
-      if (new URL(origin).origin !== publicOrigin) {
-        return NextResponse.json({ error: "Invalid checkout origin." }, { status: 403 })
-      }
-    } catch {
-      return NextResponse.json({ error: "Invalid checkout origin." }, { status: 403 })
-    }
+  if (!hasValidCheckoutOrigin(request, publicOrigin)) {
+    return NextResponse.json({ error: "Invalid checkout origin." }, { status: 403 })
   }
 
   const body: unknown = await request.json().catch(() => null)
