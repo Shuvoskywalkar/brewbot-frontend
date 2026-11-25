@@ -33,7 +33,7 @@ export function AdminSignIn({ denied = false }: { denied?: boolean }) {
       router.replace("/admin")
       router.refresh()
     } catch {
-      setMessage("Sign-in is temporarily unavailable. Please try again.")
+      setMessage("Sign-in failed. Check your owner account details and try again.")
       setBusy(false)
     }
   }
