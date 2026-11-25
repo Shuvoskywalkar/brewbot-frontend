@@ -20,6 +20,7 @@ type DeviceStorefrontProps = {
 
 export function DeviceStorefront({ deviceId, universityName, locationName }: DeviceStorefrontProps) {
   const router = useRouter()
+  const displayUniversityName = universityName.trim() === "Dhaka University" ? "University of Dhaka" : universityName
   const buy = (id: string) => router.push(`/checkout?product=${encodeURIComponent(id)}&deviceId=${encodeURIComponent(deviceId)}`)
 
   return (
@@ -27,7 +28,7 @@ export function DeviceStorefront({ deviceId, universityName, locationName }: Dev
       <section className="kiosk-location" aria-label="Device location">
         <div className="kiosk-location-header">
           <div className="kiosk-location-details">
-            <div className="kiosk-location-title"><Building2 className="kiosk-building-icon" aria-hidden="true"/><h1>{universityName}</h1></div>
+            <div className="kiosk-location-title"><Building2 className="kiosk-building-icon" aria-hidden="true"/><h1>{displayUniversityName}</h1></div>
             <p className="kiosk-hall"><MapPin size={17} fill="currentColor"/> {locationName}</p>
             <p className="kiosk-last-stock">Last Stock: 24 Nov, 09:45 PM</p>
           </div>

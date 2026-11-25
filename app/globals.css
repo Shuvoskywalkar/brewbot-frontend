@@ -886,12 +886,16 @@ a { color: inherit; text-decoration: none; }
 @media (max-width: 420px) {
   .kiosk-screen { min-height: 100svh; padding: 8px 10px; }
   .kiosk-location { margin-bottom: 8px; padding: 10px 12px; }
-  .kiosk-location-header { align-items: center; justify-content: space-between; gap: 8px; }
-  .kiosk-location-details { min-width: 0; }
-  .kiosk-location-title h1 { font-size: 15px; }
+  .kiosk-location-header { align-items: center; justify-content: space-between; gap: 6px; }
+  .kiosk-location-details { min-width: 0; flex: 1; }
+  .kiosk-location-title { gap: 6px; }
+  .kiosk-location-title h1 { font-size: 13px; letter-spacing: -.2px; }
+  .kiosk-building-icon { width: 20px; height: 22px; }
   .kiosk-hall { margin: 7px 0 3px; }
   .kiosk-brand-stack { display: flex; flex: 0 0 auto; flex-direction: column; align-items: flex-end; gap: 4px; }
-  .kiosk-brand { gap: 4px; }
+  .kiosk-brand { gap: 5px; }
+  .kiosk-brand .brewbot-mark { width: 31px; height: 31px; }
+  .kiosk-brand .brewbot-word { font-size: 16px; letter-spacing: -.4px; }
   .kiosk-wallet-fab { position: static; display: grid; place-items: center; width: 28px; height: 28px; border: 1px solid #ffffff70; border-radius: 50%; background: #252930; color: #fff; box-shadow: none; }
   .kiosk-wallet-fab svg { width: 15px; height: 15px; }
   .kiosk-products { display: flex; flex-direction: column; gap: 8px; }
