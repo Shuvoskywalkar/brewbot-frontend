@@ -4,7 +4,7 @@ import Image from "next/image"
 import Link from "next/link"
 import { Suspense, useEffect, useState } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
-import { ArrowLeft, Clock3, CreditCard, Phone, WalletCards } from "lucide-react"
+import { ArrowLeft, Clock3, Phone, WalletCards } from "lucide-react"
 import { EPSCheckoutForm } from "@/components/eps-checkout-form"
 import { brewbotProducts, getBrewbotProduct } from "@/lib/products"
 
@@ -41,15 +41,26 @@ function CheckoutScreen() {
   return (
     <main className="checkout-compact-page">
       <header className="checkout-compact-header">
-        <Link href={deviceHomePath} aria-label="Back to products"><ArrowLeft size={20} /></Link>
+        <Link href={deviceHomePath} aria-label="Back to products"><ArrowLeft size={19} /></Link>
         <h1>Checkout</h1>
-        <span className="checkout-countdown" role="timer" aria-label={`${seconds} seconds remaining`}><Clock3 size={16} /> {seconds}s</span>
+        <span className="checkout-countdown" role="timer" aria-label={`${seconds} seconds remaining`}>
+          <Clock3 size={15} aria-hidden="true" /> {seconds}s
+        </span>
       </header>
       <div className="checkout-compact-content">
         <section className="checkout-product-card" aria-label="Selected drink">
           <Image src={selected.image} alt={selected.name} width={76} height={76} />
-          <div className="checkout-product-copy"><h2>{selected.name}</h2><p>Selected drink</p></div>
-          <strong className="checkout-product-price">{(selected.pricePaisa / 100).toFixed(2)} Tk</strong>
+          <div className="checkout-product-copy">
+            <h2>{selected.name}</h2>
+            <p>{(selected.pricePaisa / 100).toFixed(2)} Tk</p>
+          </div>
+          <strong className="checkout-product-price">
+            {(selected.pricePaisa / 100).toLocaleString("en-BD", { maximumFractionDigits: 2 })} Tk
+          </strong>
+        </section>
+        <section className="checkout-total-card" aria-label="Order total">
+          <strong>Total Amount</strong>
+          <b>{(selected.pricePaisa / 100).toLocaleString("en-BD", { maximumFractionDigits: 2 })} Tk</b>
         </section>
         {epsOpen ? (
           <EPSCheckoutForm
@@ -58,17 +69,14 @@ function CheckoutScreen() {
             onBack={() => setEpsOpen(false)}
           />
         ) : (
-          <section className="checkout-method-card" aria-labelledby="checkout-method-heading">
-            <h2 id="checkout-method-heading">Choose how to pay</h2>
-            <div className="checkout-payment-actions">
-              <button className="checkout-pay-button" type="button" onClick={() => setEpsOpen(true)}>
-                <CreditCard size={20} aria-hidden="true" /> Pay now
-              </button>
-              <button className="checkout-rfid-button" type="button" onClick={() => setRfidOpen(true)}>
-                <WalletCards size={20} aria-hidden="true" /> Pay with RFID
-              </button>
-            </div>
-          </section>
+          <footer className="checkout-payment-actions">
+            <button className="checkout-rfid-button" type="button" onClick={() => setRfidOpen(true)}>
+              <WalletCards size={18} aria-hidden="true" /> Pay with RFID Card
+            </button>
+            <button className="checkout-pay-button" type="button" onClick={() => setEpsOpen(true)}>
+              Pay Now
+            </button>
+          </footer>
         )}
       </div>
       {rfidOpen && (
