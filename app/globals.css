@@ -937,6 +937,9 @@ body:has(.checkout-compact-page) { background: #0b0b0b; }
 .checkout-payment-actions .checkout-pay-button { background: #111; color: #fff; }
 .checkout-payment-actions .checkout-pay-button:disabled { opacity: .62; cursor: wait; }
 .checkout-payment-actions .checkout-message { padding: 8px 10px; color: #881337; font-size: 12px; line-height: 1.4; }
+.checkout-eps-actions { position: static; right: auto; bottom: auto; left: auto; z-index: auto; width: 100%; max-width: none; margin: 0; padding: 0 0 max(8px, env(safe-area-inset-bottom)); background: none; }
+.checkout-eps-actions > button { width: 100%; }
+.checkout-compact-page:has(.checkout-eps-actions) { padding-bottom: 24px; }
 .checkout-eps-actions .checkout-back-button { border: 1px solid #111; background: #fff; color: #111; }
 .checkout-rfid-contact a { color: #111; }
 .eps-checkout-form { display: flex; flex-direction: column; gap: 10px; }
