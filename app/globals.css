@@ -559,6 +559,7 @@ a { color: inherit; text-decoration: none; }
   .kiosk-hall { margin: 7px 0 3px; font-size: 12px; }
   .kiosk-hall svg { width: 15px; height: 15px; }
   .kiosk-last-stock { font-size: 10px; }
+  .kiosk-topup-link { margin-top: 7px; padding: 6px 8px; font-size: 9px; }
   .kiosk-products { gap: 7px; }
   .kiosk-product { border-radius: 10px; }
   .kiosk-product-info { padding: 7px; }
@@ -607,6 +608,102 @@ a { color: inherit; text-decoration: none; }
 .kiosk-screen { padding-bottom: 84px; }
 .kiosk-ad-slot { position: fixed; left: 50%; bottom: max(10px, env(safe-area-inset-bottom)); z-index: 10; display: flex; align-items: center; width: calc(100% - 20px); max-width: 400px; height: 56px; margin: 0; overflow: hidden; transform: translateX(-50%); border: 1px solid #111; border-radius: 8px; background: #fff; box-shadow: 0 3px 12px #0002; }
 .kiosk-ad-slot img { object-fit: cover; object-position: center; filter: grayscale(1); }
+
+/* RFID wallet recharge demo */
+.recharge-page { min-height: 100svh; padding: 0 18px 48px; background: #f7f7f2; color: #222a23; }
+.recharge-header { display: flex; align-items: center; gap: 13px; max-width: 980px; height: 68px; margin: 0 auto; border-bottom: 1px solid #e5e7df; }
+.recharge-header .brewbot-word { font-size: 17px; }
+.recharge-back { display: grid; flex: 0 0 34px; place-items: center; width: 34px; height: 34px; border: 1px solid #e5e7df; border-radius: 10px; color: #536254; }
+.recharge-back svg { width: 17px; height: 17px; }
+.recharge-header-label { margin-left: auto; color: #80877d; font-size: 9px; font-weight: 750; letter-spacing: 1.2px; }
+.recharge-content { width: min(100%, 540px); margin: 0 auto; }
+.recharge-intro { padding: 32px 4px 20px; text-align: center; }
+.recharge-icon { display: grid; place-items: center; width: 48px; height: 48px; margin: 0 auto 15px; border-radius: 15px; background: #e9f0e8; color: #315c40; }
+.recharge-icon svg { width: 23px; height: 23px; }
+.recharge-eyebrow { margin: 0 0 7px; color: #718071; font-size: 9px; font-weight: 750; letter-spacing: 1.4px; }
+.recharge-intro h1 { margin: 0; font-size: clamp(25px, 6vw, 32px); line-height: 1.13; letter-spacing: -1.1px; }
+.recharge-intro > p:last-child { max-width: 360px; margin: 9px auto 0; color: #747c72; font-size: 12px; line-height: 1.55; }
+.recharge-demo-notice { display: flex; align-items: center; gap: 11px; margin-bottom: 12px; padding: 12px 13px; border: 1px solid #eadcc6; border-radius: 12px; background: #fbf5e9; color: #554b38; }
+.recharge-demo-mark { display: grid; flex: 0 0 42px; place-items: center; height: 26px; border-radius: 6px; background: #e9d7b8; color: #6c5737; font-size: 8px; font-weight: 800; letter-spacing: .6px; }
+.recharge-demo-notice p { flex: 1; margin: 0; }
+.recharge-demo-notice strong, .recharge-demo-notice p span { display: block; }
+.recharge-demo-notice strong { margin-bottom: 3px; font-size: 11px; }
+.recharge-demo-notice p span { color: #766c58; font-size: 10px; line-height: 1.4; }
+.recharge-demo-notice > svg { width: 16px; height: 16px; flex: 0 0 auto; color: #997749; }
+.recharge-card { margin-top: 11px; padding: 17px; border: 1px solid #e5e7df; border-radius: 14px; background: #fff; box-shadow: 0 3px 12px #26332708; }
+.recharge-section-heading { display: flex; align-items: center; gap: 11px; }
+.recharge-step { display: grid; flex: 0 0 28px; place-items: center; width: 28px; height: 28px; border-radius: 9px; background: #edf3ec; color: #42644a; font-size: 9px; font-weight: 750; }
+.recharge-section-heading > div { min-width: 0; flex: 1; }
+.recharge-section-heading h2 { margin: 0; font-size: 13px; font-weight: 700; letter-spacing: -.1px; }
+.recharge-section-heading p { margin: 4px 0 0; color: #858b81; font-size: 10px; line-height: 1.4; }
+.recharge-lookup-form { display: flex; flex-direction: column; gap: 8px; margin-top: 17px; }
+.recharge-lookup-form label { color: #384238; font-size: 10px; font-weight: 650; }
+.recharge-lookup-form input { width: 100%; height: 43px; padding: 0 12px; border: 1px solid #dfe3da; border-radius: 9px; background: #fff; color: #242d25; font-size: 12px; outline: none; }
+.recharge-lookup-form input:focus { border-color: #65856b; box-shadow: 0 0 0 3px #6382661a; }
+.recharge-hint, .recharge-error { margin: 0; font-size: 10px; line-height: 1.4; }
+.recharge-hint { color: #858b81; }
+.recharge-error { color: #b33a37; }
+.recharge-primary-button { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; min-height: 44px; margin-top: 5px; border: 0; border-radius: 9px; background: #264b37; color: #fff; font-size: 11px; font-weight: 700; transition: background .15s ease, opacity .15s ease; }
+.recharge-primary-button:hover:not(:disabled) { background: #1e402d; }
+.recharge-primary-button:disabled { cursor: not-allowed; opacity: .55; }
+.recharge-primary-button svg { width: 15px; height: 15px; }
+.recharge-text-button { padding: 6px; border: 0; background: transparent; color: #456b4c; font-size: 10px; font-weight: 700; }
+.recharge-account-summary { display: flex; align-items: center; gap: 10px; margin-top: 15px; padding: 12px; border-radius: 10px; background: #f6f8f4; }
+.recharge-avatar { display: grid; flex: 0 0 35px; place-items: center; width: 35px; height: 35px; border-radius: 50%; background: #dce9dc; color: #315c40; font-size: 10px; font-weight: 750; }
+.recharge-account-summary > div { min-width: 0; flex: 1; }
+.recharge-account-summary > div strong, .recharge-account-summary > div span { display: block; }
+.recharge-account-summary > div strong { font-size: 11px; }
+.recharge-account-summary > div span { margin-top: 4px; color: #7f877d; font-size: 9px; }
+.recharge-account-summary > p { margin: 0 0 0 auto; text-align: right; }
+.recharge-account-summary > p small, .recharge-account-summary > p strong { display: block; }
+.recharge-account-summary > p small { color: #81887d; font-size: 8px; }
+.recharge-account-summary > p strong { margin-top: 4px; font-size: 12px; }
+.recharge-amount-options { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 9px; margin-top: 15px; }
+.recharge-amount-options button { min-height: 43px; border: 1px solid #e2e6de; border-radius: 9px; background: #fff; color: #384238; font-size: 11px; font-weight: 700; }
+.recharge-amount-options button:hover { border-color: #9caf9c; }
+.recharge-amount-options button.is-selected { border-color: #426a49; background: #edf4eb; color: #315c40; box-shadow: inset 0 0 0 1px #426a49; }
+.recharge-methods { display: flex; flex-direction: column; gap: 8px; min-width: 0; margin: 15px 0 0; padding: 0; border: 0; }
+.recharge-method { display: flex; align-items: center; gap: 10px; min-height: 58px; padding: 8px 10px; border: 1px solid #e5e7df; border-radius: 10px; cursor: pointer; }
+.recharge-method.is-selected { border-color: #69866e; background: #f8faf6; }
+.recharge-method input { position: absolute; width: 1px; height: 1px; opacity: 0; }
+.recharge-method:focus-within { outline: 3px solid #63826640; outline-offset: 2px; }
+.recharge-method-mark { display: grid; flex: 0 0 34px; place-items: center; width: 34px; height: 34px; border-radius: 9px; color: white; font-size: 16px; font-weight: 800; }
+.recharge-method-mark.bkash { background: #d12053; }
+.recharge-method-mark.nagad { background: #f16a25; }
+.recharge-method-mark.bank { background: #31583e; }
+.recharge-method-mark svg { width: 17px; height: 17px; }
+.recharge-method-copy { flex: 1; }
+.recharge-method-copy strong, .recharge-method-copy small { display: block; }
+.recharge-method-copy strong { font-size: 11px; }
+.recharge-method-copy small { margin-top: 3px; color: #858b81; font-size: 9px; }
+.recharge-radio-indicator { display: grid; place-items: center; width: 17px; height: 17px; border: 1.5px solid #cbd1c8; border-radius: 50%; }
+.recharge-method.is-selected .recharge-radio-indicator { border-color: #426a49; }
+.recharge-method.is-selected .recharge-radio-indicator::after { width: 9px; height: 9px; border-radius: 50%; background: #426a49; content: ""; }
+.recharge-total { display: flex; align-items: center; justify-content: space-between; padding-bottom: 13px; border-bottom: 1px solid #edf0e9; color: #727a70; font-size: 11px; }
+.recharge-total strong { color: #263b2c; font-size: 18px; letter-spacing: -.4px; }
+.recharge-demo-actions { display: flex; flex-direction: column; gap: 3px; margin-top: 13px; }
+.recharge-demo-actions .recharge-primary-button { margin-top: 0; }
+.recharge-fail-button { min-height: 35px; border: 0; background: transparent; color: #7d8179; font-size: 10px; font-weight: 600; }
+.recharge-processing { margin: 17px 0 0; color: #58705c; text-align: center; font-size: 11px; }
+.recharge-result { display: flex; align-items: flex-start; gap: 10px; margin-top: 14px; padding: 12px; border-radius: 10px; }
+.recharge-result-success { background: #edf6ed; color: #315c3d; }
+.recharge-result-failed { background: #fbf1ee; color: #914d3c; }
+.recharge-result-icon { display: grid; flex: 0 0 25px; place-items: center; width: 25px; height: 25px; border-radius: 50%; background: #fff; }
+.recharge-result-icon svg { width: 14px; height: 14px; }
+.recharge-result > div strong { font-size: 11px; }
+.recharge-result > div p { margin: 4px 0; font-size: 10px; line-height: 1.4; }
+.recharge-result > div small { color: #758477; font-size: 9px; }
+.recharge-security-note { display: flex; align-items: flex-start; gap: 6px; margin: 13px 0 0; color: #7b8278; font-size: 9px; line-height: 1.5; }
+.recharge-security-note svg { flex: 0 0 13px; width: 13px; height: 13px; color: #6b866e; }
+.recharge-sample-note { margin-top: 15px; padding: 0 3px; color: #7b8278; }
+.recharge-sample-note > strong { display: block; margin-bottom: 8px; color: #626b61; font-size: 9px; }
+.recharge-sample-note > div { display: flex; flex-wrap: wrap; gap: 7px; }
+.recharge-sample-note button { padding: 7px 9px; border: 1px solid #e3e6df; border-radius: 7px; background: #fff; color: #4a594a; font-size: 9px; font-weight: 650; }
+.recharge-sample-note button span { margin-left: 4px; color: #879087; font-weight: 400; }
+.recharge-sample-note > p { margin: 7px 0 0; color: #91968d; font-size: 9px; }
+.kiosk-topup-link { display: inline-flex; align-items: center; gap: 6px; margin-top: 9px; padding: 7px 9px; border: 1px solid #ffffff42; border-radius: 7px; background: #ffffff12; color: #fff; font-size: 10px; font-weight: 650; }
+.kiosk-topup-link:hover { background: #ffffff22; }
+.kiosk-topup-link svg { width: 14px; height: 14px; }
 
 /* Shared BrewBot identity */
 .brewbot-logo { display: inline-flex; align-items: center; gap: 8px; color: #20352a; }
