@@ -916,6 +916,10 @@ a { color: inherit; text-decoration: none; }
 .checkout-payment-actions .checkout-pay-button { background: #111; color: #fff; }
 .checkout-rfid-contact a { color: #111; }
 .checkout-compact-page { padding-bottom: 236px; }
+.checkout-method-card { display: flex; flex-direction: column; gap: 14px; padding: 16px; border: 1px solid #e3e3e3; border-radius: 15px; background: #fff; }
+.checkout-method-card h2 { margin: 0; font-size: 16px; }
+.checkout-method-card .checkout-payment-actions { position: static; gap: 9px; padding: 0; background: none; }
+.checkout-eps-actions .checkout-back-button { border: 1px solid #111; background: #fff; color: #111; }
 .eps-checkout-form { display: flex; flex-direction: column; gap: 10px; }
 .eps-customer-card { padding: 14px; border: 1px solid #e3e3e3; border-radius: 15px; background: #fff; box-shadow: 0 2px 7px #272d3708; }
 .eps-details-heading h2 { margin: 0; font-size: 16px; }

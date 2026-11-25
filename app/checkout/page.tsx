@@ -4,7 +4,7 @@ import Image from "next/image"
 import Link from "next/link"
 import { Suspense, useEffect, useState } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
-import { ArrowLeft, Clock3, Phone, WalletCards } from "lucide-react"
+import { ArrowLeft, Clock3, CreditCard, Phone, WalletCards } from "lucide-react"
 import { EPSCheckoutForm } from "@/components/eps-checkout-form"
 import { brewbotProducts, getBrewbotProduct } from "@/lib/products"
 
@@ -19,6 +19,7 @@ function CheckoutScreen() {
     : null
   const deviceHomePath = validDeviceId ? `/${encodeURIComponent(validDeviceId)}` : "/"
   const [seconds, setSeconds] = useState(180)
+  const [epsOpen, setEpsOpen] = useState(false)
   const [rfidOpen, setRfidOpen] = useState(false)
 
   useEffect(() => {
@@ -50,11 +51,25 @@ function CheckoutScreen() {
           <div className="checkout-product-copy"><h2>{selected.name}</h2><p>Selected drink</p></div>
           <strong className="checkout-product-price">{(selected.pricePaisa / 100).toFixed(2)} Tk</strong>
         </section>
-        <EPSCheckoutForm
-          productId={selected.id}
-          deviceId={validDeviceId}
-          onRFIDClick={() => setRfidOpen(true)}
-        />
+        {epsOpen ? (
+          <EPSCheckoutForm
+            productId={selected.id}
+            deviceId={validDeviceId}
+            onBack={() => setEpsOpen(false)}
+          />
+        ) : (
+          <section className="checkout-method-card" aria-labelledby="checkout-method-heading">
+            <h2 id="checkout-method-heading">Choose how to pay</h2>
+            <div className="checkout-payment-actions">
+              <button className="checkout-pay-button" type="button" onClick={() => setEpsOpen(true)}>
+                <CreditCard size={20} aria-hidden="true" /> Pay now
+              </button>
+              <button className="checkout-rfid-button" type="button" onClick={() => setRfidOpen(true)}>
+                <WalletCards size={20} aria-hidden="true" /> Pay with RFID
+              </button>
+            </div>
+          </section>
+        )}
       </div>
       {rfidOpen && (
         <div className="kiosk-overlay" role="presentation" onClick={() => setRfidOpen(false)}>

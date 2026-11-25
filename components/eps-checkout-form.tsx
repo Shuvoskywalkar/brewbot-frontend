@@ -1,12 +1,12 @@
 "use client"
 
 import { FormEvent, useState } from "react"
-import { WalletCards } from "lucide-react"
+import { ArrowLeft } from "lucide-react"
 
 type EPSCheckoutFormProps = {
   productId: string
   deviceId: string | null
-  onRFIDClick: () => void
+  onBack: () => void
 }
 
 type InitializeResponse = {
@@ -14,7 +14,7 @@ type InitializeResponse = {
   error?: string
 }
 
-export function EPSCheckoutForm({ productId, deviceId, onRFIDClick }: EPSCheckoutFormProps) {
+export function EPSCheckoutForm({ productId, deviceId, onBack }: EPSCheckoutFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [message, setMessage] = useState("")
 
@@ -97,9 +97,9 @@ export function EPSCheckoutForm({ productId, deviceId, onRFIDClick }: EPSCheckou
         </div>
         <p className="eps-privacy-note">Your billing details are sent to EPS and are not stored by BrewBot.</p>
       </section>
-      <footer className="checkout-payment-actions">
-        <button className="checkout-rfid-button" type="button" onClick={onRFIDClick}>
-          <WalletCards size={20} aria-hidden="true" /> Pay with RFID Card
+      <footer className="checkout-payment-actions checkout-eps-actions">
+        <button className="checkout-back-button" type="button" onClick={onBack} disabled={isSubmitting}>
+          <ArrowLeft size={18} aria-hidden="true" /> Back to payment options
         </button>
         <button className="checkout-pay-button" type="submit" disabled={isSubmitting} aria-busy={isSubmitting}>
           {isSubmitting ? "Connecting to EPS…" : "Continue to EPS"}
