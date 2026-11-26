@@ -1,13 +1,12 @@
 'use server'
 
-import { and, eq, sql } from "drizzle-orm"
+import { and, eq, or, sql } from "drizzle-orm"
 import { db } from "@/lib/db"
-import { devices, rfidRegistrationRequests, rfidUsers } from "@/lib/db/schema"
+import { devices, rfidUsers } from "@/lib/db/schema"
 
 type RegistrationInput = {
   deviceId: unknown
-  studentName: unknown
-  studentId: unknown
+  userName: unknown
   cardHex: unknown
 }
 
@@ -17,14 +16,12 @@ export async function submitRfidRegistration(input: RegistrationInput): Promise<
   if (!input || typeof input !== "object") return "invalid"
 
   const deviceId = typeof input.deviceId === "string" ? input.deviceId.trim() : ""
-  const studentName = typeof input.studentName === "string" ? input.studentName.trim().replace(/\s+/g, " ") : ""
-  const studentId = typeof input.studentId === "string" ? input.studentId.trim().replace(/\s+/g, " ") : ""
+  const userName = typeof input.userName === "string" ? input.userName.trim().replace(/\s+/g, " ") : ""
   const rawCardHex = typeof input.cardHex === "string" ? input.cardHex.trim() : ""
   const cardId = rawCardHex.replace(/[\s:-]/g, "").toUpperCase()
 
   if (!/^[A-Z0-9_-]{1,64}$/.test(deviceId)) return "invalid"
-  if (studentName.length < 2 || studentName.length > 120) return "invalid"
-  if (studentId.length < 1 || studentId.length > 80) return "invalid"
+  if (userName.length < 2 || userName.length > 120) return "invalid"
   if (rawCardHex.length > 96 || !/^(?:[A-F0-9]{2}){2,32}$/.test(cardId)) return "invalid"
 
   try {
@@ -42,19 +39,22 @@ export async function submitRfidRegistration(input: RegistrationInput): Promise<
       .where(and(
         eq(rfidUsers.deviceId, deviceId),
         eq(rfidUsers.isActive, true),
-        sql`lower(trim(${rfidUsers.cardId})) = ${cardId.toLowerCase()}`,
+        or(
+          sql`lower(trim(${rfidUsers.cardId})) = ${cardId.toLowerCase()}`,
+          sql`lower(trim(${rfidUsers.userName})) = ${userName.toLowerCase()}`,
+        ),
       ))
       .limit(1)
 
     if (existingUser) return "duplicate"
 
-    const [savedRequest] = await db
-      .insert(rfidRegistrationRequests)
-      .values({ deviceId, studentName, studentId, cardId })
+    const [savedUser] = await db
+      .insert(rfidUsers)
+      .values({ deviceId, userName, cardId })
       .onConflictDoNothing()
-      .returning({ id: rfidRegistrationRequests.id })
+      .returning({ id: rfidUsers.id })
 
-    return savedRequest ? "saved" : "duplicate"
+    return savedUser ? "saved" : "duplicate"
   } catch {
     return "unavailable"
   }
