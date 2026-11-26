@@ -8,7 +8,6 @@ export const pool =
   globalForPostgres.postgresPool ??
   new Pool({
     connectionString: process.env.DATABASE_URL,
-    options: "-c search_path=neon_auth,public",
   })
 
 if (process.env.NODE_ENV !== "production") {
