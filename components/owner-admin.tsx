@@ -335,7 +335,7 @@ function AdvertisementEditor({
           <textarea id="campaign-copy" rows={4} maxLength={400} value={campaignCopy} onChange={(event) => { setCampaignCopy(event.target.value); setIsDirty(true) }} />
           <label htmlFor="campaign-artwork">Campaign artwork</label>
           <input id="campaign-artwork" type="file" accept="image/avif,image/gif,image/jpeg,image/png,image/webp" onChange={(event) => selectArtwork(event.target.files?.[0])} />
-          <small className="ops-file-help">Images are stored in public campaign storage and shown on the kiosk storefront. Maximum size: 4 MB.</small>
+          <small className="ops-file-help">Artwork is served on kiosk storefronts. Maximum size: 4 MB.</small>
           {campaignImage && <button className="ops-button-quiet" type="button" onClick={removeArtwork}>Remove artwork</button>}
           <button className="ops-button-primary" type="submit" disabled={busy}><Megaphone aria-hidden="true" /> {busy ? "Saving…" : "Save campaign"}</button>
         </form>

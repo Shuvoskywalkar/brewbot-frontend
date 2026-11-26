@@ -2,7 +2,13 @@ import { del, put } from "@vercel/blob"
 import { NextRequest, NextResponse } from "next/server"
 import { getAdminUser } from "@/lib/admin-auth"
 import { isSameOriginRequest } from "@/lib/request-origin"
-import { getActiveCampaign, saveActiveCampaign } from "@/lib/campaigns"
+import {
+  getActiveCampaign,
+  getActiveCampaignPrivateArtworkPath,
+  PRIVATE_CAMPAIGN_ARTWORK_URL,
+  saveActiveCampaign,
+  storePrivateCampaignArtworkPath,
+} from "@/lib/campaigns"
 
 export const dynamic = "force-dynamic"
 
@@ -67,7 +73,7 @@ export async function PUT(request: NextRequest) {
     return NextResponse.json({ error: "Check the campaign details and try again." }, { status: 400 })
   }
 
-  let uploadedArtwork: { url: string } | null = null
+  let uploadedArtwork: { url: string; pathname: string } | null = null
   let artworkUploadWarning: string | null = null
   if (rawArtwork instanceof File && rawArtwork.size > 0) {
     const contentType = rawArtwork.type.toLowerCase()
@@ -78,7 +84,7 @@ export async function PUT(request: NextRequest) {
 
     try {
       uploadedArtwork = await put(`campaigns/${crypto.randomUUID()}.${extension}`, rawArtwork, {
-        access: "public",
+        access: "private",
         addRandomSuffix: false,
         contentType,
       })
@@ -89,10 +95,22 @@ export async function PUT(request: NextRequest) {
   }
 
   try {
+    const existingPrivateArtworkPath = !uploadedArtwork && artworkUrl === PRIVATE_CAMPAIGN_ARTWORK_URL
+      ? await getActiveCampaignPrivateArtworkPath()
+      : null
+    if (artworkUrl === PRIVATE_CAMPAIGN_ARTWORK_URL && !uploadedArtwork && !existingPrivateArtworkPath) {
+      return NextResponse.json({ error: "Campaign artwork could not be verified." }, { status: 409 })
+    }
+
+    const savedArtworkUrl = uploadedArtwork
+      ? storePrivateCampaignArtworkPath(uploadedArtwork.pathname)
+      : existingPrivateArtworkPath
+        ? storePrivateCampaignArtworkPath(existingPrivateArtworkPath)
+        : artworkUrl || null
     const campaign = await saveActiveCampaign({
       headline: headline.trim(),
       supportingText: supportingText.trim(),
-      artworkUrl: uploadedArtwork?.url ?? (artworkUrl || null),
+      artworkUrl: savedArtworkUrl,
     })
     return NextResponse.json({ campaign, warning: artworkUploadWarning }, { headers: { "Cache-Control": "no-store" } })
   } catch (error) {
