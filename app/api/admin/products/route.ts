@@ -4,6 +4,7 @@ import { getAdminUser } from "@/lib/admin-auth"
 import { isSameOriginRequest } from "@/lib/request-origin"
 import { db } from "@/lib/db"
 import { products } from "@/lib/db/schema"
+import { BEVERAGE_STOCK_LIMIT } from "@/lib/inventory"
 
 export const dynamic = "force-dynamic"
 
@@ -36,7 +37,7 @@ function validateProduct(value: unknown) {
     description.length > 1000 ||
     image.length > 2048 ||
     !Number.isInteger(pricePaisa) || Number(pricePaisa) < 1 || Number(pricePaisa) > 100_000_000 ||
-    !Number.isInteger(stock) || Number(stock) < 0 || Number(stock) > 100_000 ||
+    !Number.isInteger(stock) || Number(stock) < 0 || Number(stock) > BEVERAGE_STOCK_LIMIT ||
     !Number.isInteger(sortOrder) || Number(sortOrder) < 0 || Number(sortOrder) > 100_000 ||
     typeof isActive !== "boolean"
   ) return null
