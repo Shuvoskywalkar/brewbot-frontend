@@ -1,21 +1,17 @@
 "use client"
 
 import { useState } from "react"
-import { useRouter } from "next/navigation"
-import { authClient } from "@/lib/auth/client"
 
 export function AdminSignOut() {
-  const router = useRouter()
   const [busy, setBusy] = useState(false)
 
   async function signOut() {
     if (busy) return
     setBusy(true)
     try {
-      await authClient.signOut()
+      await fetch("/api/admin/sign-out", { method: "POST" })
     } finally {
-      router.replace("/admin/sign-in")
-      router.refresh()
+      window.location.assign("/admin/sign-in")
     }
   }
 
