@@ -109,7 +109,7 @@ export function OwnerAdmin({ initialProducts, initialCampaign }: { initialProduc
           <div className="ops-breadcrumb"><span>Owner workspace</span><b aria-hidden="true">/</b>{section}</div>
           <div className="ops-top-actions">
             <Link className="ops-role-switch" href="/admin/maintainer" aria-label="Switch to device maintainer"><span>Maintainer</span><ArrowRight aria-hidden="true" /></Link>
-            {process.env.NODE_ENV !== "development" && <AdminSignOut />}
+            <AdminSignOut />
           </div>
         </header>
         <div className="ops-content">
@@ -124,9 +124,7 @@ export function OwnerAdmin({ initialProducts, initialCampaign }: { initialProduc
 
           <div className="ops-preview-note" role="note">
             <span className="ops-note-dot" aria-hidden="true" />
-            {process.env.NODE_ENV === "development"
-              ? "Development preview access is enabled without sign-in. Production admin access remains protected."
-              : section === "Products"
+            {section === "Products"
               ? "The product catalog is connected to Neon. Saved changes appear on storefronts within seconds."
               : section === "Advertisements"
                 ? "Campaigns save to Neon and appear on every storefront within seconds."
@@ -290,14 +288,14 @@ function AdvertisementEditor({
 
     try {
       const response = await fetch("/api/admin/campaign", { method: "PUT", body: formData })
-      const result = await response.json() as { campaign?: BrewbotCampaign; error?: string }
+      const result = await response.json() as { campaign?: BrewbotCampaign; error?: string; warning?: string | null }
       if (!response.ok || !result.campaign) throw new Error(result.error ?? "Campaign could not be saved.")
       setArtworkUrl(result.campaign.artworkUrl ?? "")
       setCampaignImage(result.campaign.artworkUrl ?? "")
       setPendingArtwork(null)
       await mutate({ campaign: result.campaign }, false)
       setIsDirty(false)
-      onFeedback("Campaign saved. Storefronts refresh the live content within seconds.")
+      onFeedback(result.warning ?? "Campaign saved. Storefronts refresh the live content within seconds.")
     } catch (saveError) {
       onFeedback(saveError instanceof Error ? saveError.message : "Campaign could not be saved.")
     } finally {
