@@ -57,3 +57,31 @@ export const campaigns = pgTable("campaigns", {
 }, (table) => [
   uniqueIndex("campaigns_one_active_idx").on(table.isActive).where(sql`${table.isActive} = true`),
 ])
+
+export const rfidUsers = pgTable("rfid_users", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  deviceId: text("device_id").notNull(),
+  userName: text("user_name").notNull(),
+  cardId: text("card_id").notNull(),
+  isActive: boolean("is_active").notNull().default(true),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+}, (table) => [
+  uniqueIndex("rfid_users_device_id_card_id_key").on(table.deviceId, table.cardId),
+  uniqueIndex("rfid_users_device_name_idx").on(table.deviceId, sql`lower(trim(${table.userName}))`).where(sql`${table.isActive} = true`),
+])
+
+export type RfidRegistrationStatus = "pending" | "approved" | "rejected"
+
+export const rfidRegistrationRequests = pgTable("rfid_registration_requests", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  deviceId: text("device_id").notNull(),
+  studentName: text("student_name").notNull(),
+  studentId: text("student_id").notNull(),
+  cardId: text("card_id").notNull(),
+  status: text("status").$type<RfidRegistrationStatus>().notNull().default("pending"),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+}, (table) => [
+  uniqueIndex("rfid_registration_pending_card_idx").on(table.deviceId, sql`lower(trim(${table.cardId}))`).where(sql`${table.status} = 'pending'`),
+])

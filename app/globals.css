@@ -662,6 +662,9 @@ a { color: inherit; text-decoration: none; }
 .recharge-inline-status p { margin: 0; font-size: 12px; line-height: 1.45; }
 .recharge-inline-status strong, .recharge-inline-status span { display: block; }
 .recharge-inline-status span { margin-top: 3px; color: #6d6048; }
+.recharge-inline-status-success { border-color: #b9d7c0; background: #edf6ef; color: #244b30; }
+.recharge-inline-status-success > svg { color: #39744a; }
+.recharge-inline-status-success span { color: #496b52; }
 .recharge-payment-note { margin: 13px 0 0; color: #606b60; font-size: 13px; line-height: 1.5; }
 .recharge-payment-card .recharge-primary-button { margin-top: 14px; }
 @media (max-width: 560px) {
