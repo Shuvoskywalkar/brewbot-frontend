@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm"
-import { bigint, boolean, integer, pgTable, text, timestamp, uniqueIndex, uuid } from "drizzle-orm/pg-core"
+import { bigint, boolean, index, integer, pgTable, text, timestamp, uniqueIndex, uuid } from "drizzle-orm/pg-core"
 
 export const adminAccounts = pgTable("admin", {
   id: bigint("id", { mode: "number" }).primaryKey().generatedByDefaultAsIdentity(),
@@ -66,22 +66,31 @@ export const rfidUsers = pgTable("rfid_users", {
   isActive: boolean("is_active").notNull().default(true),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  studentId: text("student_id"),
+  walletBalancePaisa: integer("wallet_balance_paisa").notNull().default(0),
 }, (table) => [
-  uniqueIndex("rfid_users_device_id_card_id_key").on(table.deviceId, table.cardId),
+  uniqueIndex("rfid_users_active_device_card_key").on(table.deviceId, table.cardId).where(sql`${table.isActive} = true`),
   uniqueIndex("rfid_users_device_name_idx").on(table.deviceId, sql`lower(trim(${table.userName}))`).where(sql`${table.isActive} = true`),
 ])
 
-export type RfidRegistrationStatus = "pending" | "approved" | "rejected"
+export type RfidWalletTopupStatus = "pending" | "paid" | "failed" | "cancelled"
 
-export const rfidRegistrationRequests = pgTable("rfid_registration_requests", {
-  id: uuid("id").primaryKey().defaultRandom(),
+export const rfidWalletTopups = pgTable("rfid_wallet_topups", {
+  merchantTransactionId: text("merchant_transaction_id").primaryKey(),
+  customerOrderId: text("customer_order_id").notNull().unique(),
+  resultToken: text("result_token").notNull().unique(),
+  rfidUserId: uuid("rfid_user_id").notNull(),
   deviceId: text("device_id").notNull(),
-  studentName: text("student_name").notNull(),
-  studentId: text("student_id").notNull(),
-  cardId: text("card_id").notNull(),
-  status: text("status").$type<RfidRegistrationStatus>().notNull().default("pending"),
+  userName: text("user_name").notNull(),
+  amountPaisa: integer("amount_paisa").notNull(),
+  status: text("status").$type<RfidWalletTopupStatus>().notNull().default("pending"),
+  epsTransactionId: text("eps_transaction_id"),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  paidAt: timestamp("paid_at", { withTimezone: true }),
+  idempotencyKey: text("idempotency_key").notNull().unique(),
+  redirectUrl: text("redirect_url"),
 }, (table) => [
-  uniqueIndex("rfid_registration_pending_card_idx").on(table.deviceId, sql`lower(trim(${table.cardId}))`).where(sql`${table.status} = 'pending'`),
+  index("rfid_wallet_topups_user_created_at_idx").on(table.rfidUserId, table.createdAt.desc()),
+  index("rfid_wallet_topups_status_created_at_idx").on(table.status, table.createdAt.desc()),
 ])
