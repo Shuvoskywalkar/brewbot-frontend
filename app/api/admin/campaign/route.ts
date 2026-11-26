@@ -81,7 +81,8 @@ export async function PUT(request: NextRequest) {
         addRandomSuffix: false,
         contentType,
       })
-    } catch {
+    } catch (error) {
+      console.error("[admin campaign] Artwork upload failed:", error)
       return NextResponse.json({ error: "Campaign artwork could not be uploaded." }, { status: 503 })
     }
   }
