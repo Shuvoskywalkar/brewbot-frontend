@@ -9,13 +9,39 @@ export type BrewbotCampaign = {
   artworkUrl: string | null
 }
 
+const PRIVATE_ARTWORK_PREFIX = "private-blob:"
+export const PRIVATE_CAMPAIGN_ARTWORK_URL = "/api/campaign/artwork"
+const privateArtworkPathPattern = /^campaigns\/[0-9a-f-]{36}\.(?:avif|gif|jpg|png|webp)$/i
+
+export function storePrivateCampaignArtworkPath(pathname: string) {
+  if (!privateArtworkPathPattern.test(pathname)) throw new Error("Invalid campaign artwork path.")
+  return `${PRIVATE_ARTWORK_PREFIX}${pathname}`
+}
+
+function parsePrivateCampaignArtworkPath(value: string | null) {
+  if (!value?.startsWith(PRIVATE_ARTWORK_PREFIX)) return null
+  const pathname = value.slice(PRIVATE_ARTWORK_PREFIX.length)
+  return privateArtworkPathPattern.test(pathname) ? pathname : null
+}
+
 function serializeCampaign(campaign: typeof campaigns.$inferSelect): BrewbotCampaign {
+  const privateArtworkPath = parsePrivateCampaignArtworkPath(campaign.artworkUrl)
   return {
     id: campaign.id,
     headline: campaign.headline,
     supportingText: campaign.supportingText,
-    artworkUrl: campaign.artworkUrl,
+    artworkUrl: privateArtworkPath ? PRIVATE_CAMPAIGN_ARTWORK_URL : campaign.artworkUrl,
   }
+}
+
+export async function getActiveCampaignPrivateArtworkPath() {
+  const [campaign] = await db
+    .select({ artworkUrl: campaigns.artworkUrl })
+    .from(campaigns)
+    .where(eq(campaigns.isActive, true))
+    .limit(1)
+
+  return parsePrivateCampaignArtworkPath(campaign?.artworkUrl ?? null)
 }
 
 export async function getActiveCampaign() {
