@@ -67,18 +67,25 @@ export function AdminSignIn({ denied = false, verified = false }: { denied?: boo
     setMessage("")
 
     try {
-      await authClient.emailOtp.sendVerificationOtp({
+      const result = await authClient.emailOtp.sendVerificationOtp({
         email: submittedEmail,
         type: "email-verification",
       })
+
+      if (result.error) {
+        setVerificationRequested(false)
+        setMessage("A verification code could not be sent. Check the email address and try again, or contact the site administrator.")
+        setMessageStatus("error")
+        return
+      }
 
       setVerificationRequested(true)
       setMessage("If this address has an unverified owner account, a code may be sent. Check your inbox and spam folder.")
       setMessageStatus("success")
     } catch {
-      setVerificationRequested(true)
-      setMessage("If this address has an unverified owner account, a code may be sent. Check your inbox and spam folder.")
-      setMessageStatus("success")
+      setVerificationRequested(false)
+      setMessage("A verification code could not be sent. Check your connection and try again, or contact the site administrator.")
+      setMessageStatus("error")
     } finally {
       setBusy(false)
     }
