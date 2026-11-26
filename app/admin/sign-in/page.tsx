@@ -4,12 +4,7 @@ import { getAdminUser } from "@/lib/admin-auth"
 
 export const dynamic = "force-dynamic"
 
-export default async function AdminSignInPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ denied?: string; verified?: string }>
-}) {
+export default async function AdminSignInPage() {
   if (await getAdminUser()) redirect("/admin")
-  const { denied, verified } = await searchParams
-  return <AdminSignIn denied={denied === "1"} verified={verified === "1"} />
+  return <AdminSignIn />
 }

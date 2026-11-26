@@ -13,8 +13,8 @@ export const metadata: Metadata = {
 }
 
 export default async function AdminPage() {
-  const { user, authorized } = await getAdminAccess()
-  if (!authorized) redirect(user ? "/admin/sign-in?denied=1" : "/admin/sign-in")
+  const { authorized } = await getAdminAccess()
+  if (!authorized) redirect("/admin/sign-in")
   const [products, campaign] = await Promise.all([getAllProducts(), getActiveCampaign()])
   return <OwnerAdmin initialProducts={products} initialCampaign={campaign} />
 }
