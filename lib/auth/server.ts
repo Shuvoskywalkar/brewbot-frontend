@@ -1,16 +1,59 @@
-import { createNeonAuth } from "@neon/auth/next/server"
+import { betterAuth } from "better-auth"
+import { PostgresDialect } from "kysely"
+import { pool } from "@/lib/db"
 
-const baseUrl = process.env.NEON_AUTH_BASE_URL
-const cookieSecret = process.env.NEON_AUTH_COOKIE_SECRET ?? process.env.BETTER_AUTH_SECRET
-
-if (!baseUrl || !cookieSecret || cookieSecret.length < 32) {
-  throw new Error("Neon Auth requires NEON_AUTH_BASE_URL and a 32-character session cookie secret.")
-}
-
-export const auth = createNeonAuth({
-  baseUrl,
-  cookies: {
-    secret: cookieSecret,
-    sameSite: process.env.NODE_ENV === "development" ? "none" : "lax",
+export const auth = betterAuth({
+  database: {
+    dialect: new PostgresDialect({ pool }),
+    type: "postgres",
+    schemaName: "neon_auth",
+  },
+  baseURL:
+    process.env.BETTER_AUTH_URL ??
+    (process.env.VERCEL_PROJECT_PRODUCTION_URL
+      ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+      : process.env.VERCEL_URL
+        ? `https://${process.env.VERCEL_URL}`
+        : process.env.V0_RUNTIME_URL),
+  emailAndPassword: {
+    enabled: true,
+    disableSignUp: true,
+  },
+  trustedOrigins: [
+    ...(process.env.NODE_ENV === "development"
+      ? [
+          "http://localhost:3000",
+          ...(process.env.V0_RUNTIME_URL ? [process.env.V0_RUNTIME_URL] : []),
+          ...(process.env.V0_DEV_APP_URL ? [process.env.V0_DEV_APP_URL] : []),
+          ...(process.env.V0_BUILD_URL ? [process.env.V0_BUILD_URL] : []),
+          ...(process.env.V0_SANDBOX_URL ? [process.env.V0_SANDBOX_URL] : []),
+        ]
+      : []),
+    ...(process.env.NODE_ENV === "production"
+      ? [
+          ...(process.env.VERCEL_URL ? [`https://${process.env.VERCEL_URL}`] : []),
+          ...(process.env.VERCEL_PROJECT_PRODUCTION_URL
+            ? [`https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`]
+            : []),
+        ]
+      : []),
+  ],
+  session: {
+    expiresIn: 60 * 60 * 24 * 7,
+    updateAge: 60 * 60 * 24,
+  },
+  advanced: {
+    database: {
+      generateId: false,
+      validateSchema: false,
+    },
+    ...(process.env.NODE_ENV === "development"
+      ? {
+          defaultCookieAttributes: {
+            sameSite: "none" as const,
+            secure: true,
+          },
+        }
+      : {}),
   },
 })

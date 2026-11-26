@@ -1,15 +1,9 @@
+import { headers } from "next/headers"
 import { auth } from "@/lib/auth/server"
 
 export async function getAdminAccess() {
-  let user = null
-  try {
-    const { data } = await auth.getSession()
-    user = data?.user ?? null
-  } catch (error) {
-    if (!(error instanceof Error) || !error.message.includes("Cookies can only be modified")) {
-      throw error
-    }
-  }
+  const session = await auth.api.getSession({ headers: await headers() })
+  const user = session?.user ?? null
 
   const allowedEmails = (process.env.ADMIN_EMAILS ?? "")
     .split(",")
