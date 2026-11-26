@@ -68,6 +68,7 @@ export async function PUT(request: NextRequest) {
   }
 
   let uploadedArtwork: { url: string } | null = null
+  let artworkUploadWarning: string | null = null
   if (rawArtwork instanceof File && rawArtwork.size > 0) {
     const contentType = rawArtwork.type.toLowerCase()
     const extension = artworkExtensions[contentType]
@@ -83,7 +84,7 @@ export async function PUT(request: NextRequest) {
       })
     } catch (error) {
       console.error("[admin campaign] Artwork upload failed:", error)
-      return NextResponse.json({ error: "Campaign artwork could not be uploaded." }, { status: 503 })
+      artworkUploadWarning = "Campaign text was saved, but the new artwork could not be uploaded. Existing artwork was retained."
     }
   }
 
@@ -93,8 +94,9 @@ export async function PUT(request: NextRequest) {
       supportingText: supportingText.trim(),
       artworkUrl: uploadedArtwork?.url ?? (artworkUrl || null),
     })
-    return NextResponse.json({ campaign }, { headers: { "Cache-Control": "no-store" } })
-  } catch {
+    return NextResponse.json({ campaign, warning: artworkUploadWarning }, { headers: { "Cache-Control": "no-store" } })
+  } catch (error) {
+    console.error("[admin campaign] Campaign save failed:", error)
     if (uploadedArtwork) await del(uploadedArtwork.url).catch(() => undefined)
     return NextResponse.json({ error: "Campaign could not be saved." }, { status: 503 })
   }
