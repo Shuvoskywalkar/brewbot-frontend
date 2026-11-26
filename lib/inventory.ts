@@ -1,0 +1,1 @@
+export const BEVERAGE_STOCK_LIMIT = 65

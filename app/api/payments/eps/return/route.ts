@@ -1,7 +1,7 @@
-import { and, eq, ne } from "drizzle-orm"
+import { and, eq, gt, ne, sql } from "drizzle-orm"
 import { NextRequest, NextResponse } from "next/server"
 import { db } from "@/lib/db"
-import { paymentAttempts } from "@/lib/db/schema"
+import { paymentAttempts, products } from "@/lib/db/schema"
 import { verifyEPSTransaction } from "@/lib/payments/eps"
 
 export const runtime = "nodejs"
@@ -45,17 +45,41 @@ export async function GET(request: NextRequest) {
           ? "cancelled"
           : "failed"
 
-    await db.update(paymentAttempts)
-      .set({
-        status: verifiedStatus,
-        epsTransactionId: verification.epsTransactionId,
-        updatedAt: new Date(),
-        paidAt: verifiedStatus === "paid" ? new Date() : null,
+    if (verifiedStatus === "paid") {
+      const paidAt = new Date()
+      await db.transaction(async (tx) => {
+        const [settledAttempt] = await tx.update(paymentAttempts)
+          .set({
+            status: "paid",
+            epsTransactionId: verification.epsTransactionId,
+            updatedAt: paidAt,
+            paidAt,
+          })
+          .where(and(
+            eq(paymentAttempts.merchantTransactionId, merchantTransactionId),
+            ne(paymentAttempts.status, "paid"),
+          ))
+          .returning({ productId: paymentAttempts.productId })
+
+        if (!settledAttempt) return
+
+        await tx.update(products)
+          .set({ stock: sql`GREATEST(${products.stock} - 1, 0)` })
+          .where(and(eq(products.id, settledAttempt.productId), gt(products.stock, 0)))
       })
-      .where(and(
-        eq(paymentAttempts.merchantTransactionId, merchantTransactionId),
-        ne(paymentAttempts.status, "paid"),
-      ))
+    } else {
+      await db.update(paymentAttempts)
+        .set({
+          status: verifiedStatus,
+          epsTransactionId: verification.epsTransactionId,
+          updatedAt: new Date(),
+          paidAt: null,
+        })
+        .where(and(
+          eq(paymentAttempts.merchantTransactionId, merchantTransactionId),
+          ne(paymentAttempts.status, "paid"),
+        ))
+    }
 
     return resultRedirect(request, attempt.resultToken)
   } catch {

@@ -88,7 +88,7 @@ export function DeviceStorefront({ deviceId, universityName, locationName, initi
             <div className="kiosk-product-image"><Image src={product.image || "/coffee-cup.png"} alt={product.name} fill sizes="64px" unoptimized /></div>
             <div className="kiosk-product-info">
               <h2>{product.name}</h2>
-              <p><span>Stock: {product.stock}</span><strong>{(product.pricePaisa / 100).toFixed(2)} Tk</strong></p>
+              <p><span>Stock: {product.stock} cups</span><strong>{(product.pricePaisa / 100).toFixed(2)} Tk</strong></p>
               {product.description && <small>{product.description}</small>}
             </div>
             <button className="kiosk-buy" type="button" onClick={() => buy(product.id)} disabled={product.stock <= 0} aria-label={product.stock > 0 ? `Buy ${product.name}` : `${product.name} is sold out`}>{product.stock > 0 ? "Buy" : "Sold out"}</button>

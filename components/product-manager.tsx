@@ -4,6 +4,7 @@ import Image from "next/image"
 import { useState, type FormEvent } from "react"
 import useSWR from "swr"
 import { Archive, Check, Pencil, Plus, RotateCcw, X } from "lucide-react"
+import { BEVERAGE_STOCK_LIMIT } from "@/lib/inventory"
 
 type Product = {
   id: string
@@ -24,7 +25,7 @@ const blankDraft: ProductDraft = {
   description: "",
   pricePaisa: 0,
   image: "/coffee-cup.png",
-  stock: 0,
+  stock: BEVERAGE_STOCK_LIMIT,
   isActive: true,
   sortOrder: 100,
 }
@@ -90,6 +91,35 @@ export function ProductManager({ initialProducts }: { initialProducts: Product[]
     }
   }
 
+  async function refillProduct(product: Product) {
+    if (busy || product.stock >= BEVERAGE_STOCK_LIMIT) return
+    setBusy(true)
+    setFeedback("")
+    try {
+      const response = await fetch(`/api/admin/products/${encodeURIComponent(product.id)}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: product.name,
+          description: product.description,
+          image: product.image,
+          pricePaisa: product.pricePaisa,
+          stock: BEVERAGE_STOCK_LIMIT,
+          sortOrder: product.sortOrder,
+          isActive: product.isActive,
+        }),
+      })
+      const result = await response.json() as { error?: string }
+      if (!response.ok) throw new Error(result.error ?? "Stock could not be refilled.")
+      await mutate()
+      setFeedback(`${product.name} stock refilled to ${BEVERAGE_STOCK_LIMIT} cups.`)
+    } catch (refillError) {
+      setFeedback(refillError instanceof Error ? refillError.message : "Stock could not be refilled.")
+    } finally {
+      setBusy(false)
+    }
+  }
+
   async function archiveProduct(product: Product) {
     setBusy(true)
     setFeedback("")
@@ -113,7 +143,7 @@ export function ProductManager({ initialProducts }: { initialProducts: Product[]
         <div>
           <p className="ops-eyebrow">LIVE MENU</p>
           <h2 id="products-heading">Products</h2>
-          <p>Changes save to Neon and appear on the storefront within seconds.</p>
+          <p>Stock is capped at {BEVERAGE_STOCK_LIMIT} cups. Refill after restocking; changes appear on the storefront within seconds.</p>
         </div>
         {!draft && <button className="ops-button-primary" type="button" onClick={() => editProduct()}><Plus aria-hidden="true" /> Add product</button>}
       </div>
@@ -132,7 +162,7 @@ export function ProductManager({ initialProducts }: { initialProducts: Product[]
           <label>Description<textarea rows={2} maxLength={1000} value={draft.description} onChange={(event) => setDraft({ ...draft, description: event.target.value })} /></label>
           <div className="ops-product-form-row">
             <label>Price (Tk)<input type="number" min="0.01" max="1000000" step="0.01" inputMode="decimal" value={price} onChange={(event) => setPrice(event.target.value)} required /></label>
-            <label>Stock<input type="number" min="0" max="100000" step="1" value={draft.stock} onChange={(event) => setDraft({ ...draft, stock: Number(event.target.value) })} required /></label>
+            <label>Stock (cups, max {BEVERAGE_STOCK_LIMIT})<input type="number" min="0" max={BEVERAGE_STOCK_LIMIT} step="1" value={draft.stock} onChange={(event) => setDraft({ ...draft, stock: Number(event.target.value) })} required /></label>
           </div>
           <label>Image URL or site path<input type="text" maxLength={2048} placeholder="/coffee-cup.png or https://…" value={draft.image} onChange={(event) => setDraft({ ...draft, image: event.target.value })} /></label>
           <label>Display order<input type="number" min="0" max="100000" step="1" value={draft.sortOrder} onChange={(event) => setDraft({ ...draft, sortOrder: Number(event.target.value) })} required /></label>
@@ -151,7 +181,7 @@ export function ProductManager({ initialProducts }: { initialProducts: Product[]
             <Image src={product.image || "/coffee-cup.png"} alt={`${product.name} product`} width={52} height={52} unoptimized />
             <div className="ops-product-copy">
               <strong>{product.name}</strong>
-              <span>{product.isActive ? `Stock: ${product.stock}` : "Archived · hidden from storefront"}</span>
+              <span>{product.isActive ? `Stock: ${product.stock}/${BEVERAGE_STOCK_LIMIT} cups` : "Archived · hidden from storefront"}</span>
             </div>
             <strong className="ops-product-price">Tk {(product.pricePaisa / 100).toFixed(2)}</strong>
             {archiveId === product.id ? (
@@ -162,6 +192,11 @@ export function ProductManager({ initialProducts }: { initialProducts: Product[]
             ) : (
               <div className="ops-product-actions">
                 <button className="ops-icon-action" type="button" aria-label={`Edit ${product.name}`} onClick={() => editProduct(product)}><Pencil aria-hidden="true" /> Edit</button>
+                {product.isActive && product.stock < BEVERAGE_STOCK_LIMIT && (
+                  <button className="ops-icon-action" type="button" aria-label={`Refill ${product.name} to ${BEVERAGE_STOCK_LIMIT} cups`} disabled={busy} onClick={() => refillProduct(product)}>
+                    <RotateCcw aria-hidden="true" /> Refill to {BEVERAGE_STOCK_LIMIT}
+                  </button>
+                )}
                 {product.isActive
                   ? <button className="ops-icon-action ops-archive-action" type="button" aria-label={`Archive ${product.name}`} onClick={() => setArchiveId(product.id)}><Archive aria-hidden="true" /></button>
                   : <button className="ops-icon-action" type="button" aria-label={`Restore ${product.name}`} onClick={() => editProduct({ ...product, isActive: true })}><RotateCcw aria-hidden="true" /></button>}
