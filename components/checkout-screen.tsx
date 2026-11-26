@@ -72,8 +72,12 @@ export function CheckoutScreen({ product, requestedDeviceId }: CheckoutScreenPro
           <section className="kiosk-modal checkout-rfid-modal" role="dialog" aria-modal="true" aria-labelledby="rfid-title" onClick={(event) => event.stopPropagation()}>
             <button className="kiosk-modal-close" onClick={() => setRfidOpen(false)} aria-label="Close">×</button>
             <WalletCards size={28} />
-            <h2 id="rfid-title">Get your free RFID subscription</h2>
-            <p><strong className="rfid-instruction-highlight">Hold your RFID card in front of the machine&apos;s card reader.</strong> Wait up to 60 seconds for your order to dispense. <strong>No card?</strong> Bring your university ID or contact the hall machine coordinator.</p>
+            <h2 id="rfid-title" className="rfid-subscription-title">Get your free RFID subscription</h2>
+            <div className="rfid-instruction-highlight">
+              <p><strong>Hold your RFID card in front of the machine&apos;s card reader.</strong></p>
+              <p>Wait up to 60 seconds for your order to dispense.</p>
+            </div>
+            <p className="rfid-no-card-help"><strong>No card?</strong> Bring your university ID or contact the hall machine coordinator.</p>
             <address className="checkout-rfid-contact">
               <strong>Bruce Wayne</strong>
               <span>221B Baker Street, Jagannath Hall</span>

@@ -2,28 +2,45 @@
 
 import Link from "next/link"
 import { type FormEvent, useState } from "react"
-import { ArrowLeft, ArrowRight, CircleAlert, UserRoundPlus, WalletCards } from "lucide-react"
+import { ArrowLeft, ArrowRight, CheckCircle2, CircleAlert, UserRoundPlus, WalletCards } from "lucide-react"
 import { BrewBotLogo } from "@/components/brewbot-logo"
+import { submitRfidRegistration, type RfidRegistrationResult } from "@/lib/rfid-registration-action"
 
 type RechargeStep = "lookup" | "register"
 
-export function RechargeFlow({ backHref }: { backHref: string }) {
+export function RechargeFlow({ backHref, deviceId }: { backHref: string; deviceId: string }) {
   const [step, setStep] = useState<RechargeStep>("lookup")
   const [lookupValue, setLookupValue] = useState("")
   const [studentName, setStudentName] = useState("")
   const [studentId, setStudentId] = useState("")
   const [cardHex, setCardHex] = useState("")
   const [lookupAttempted, setLookupAttempted] = useState(false)
-  const [registrationSubmitted, setRegistrationSubmitted] = useState(false)
+  const [registrationStatus, setRegistrationStatus] = useState<RfidRegistrationResult | null>(null)
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   function checkAccount(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     setLookupAttempted(true)
   }
 
-  function submitRegistration(event: FormEvent<HTMLFormElement>) {
+  async function submitRegistration(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
-    setRegistrationSubmitted(true)
+    setRegistrationStatus(null)
+    setIsSubmitting(true)
+
+    try {
+      const result = await submitRfidRegistration({ deviceId, studentName, studentId, cardHex })
+      setRegistrationStatus(result)
+      if (result === "saved") {
+        setStudentName("")
+        setStudentId("")
+        setCardHex("")
+      }
+    } catch {
+      setRegistrationStatus("unavailable")
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   function openRegistration() {
@@ -32,12 +49,12 @@ export function RechargeFlow({ backHref }: { backHref: string }) {
     setStudentId("")
     setCardHex("")
     setStep("register")
-    setRegistrationSubmitted(false)
+    setRegistrationStatus(null)
   }
 
   function returnToLookup() {
     setStep("lookup")
-    setRegistrationSubmitted(false)
+    setRegistrationStatus(null)
   }
 
   return (
@@ -78,17 +95,25 @@ export function RechargeFlow({ backHref }: { backHref: string }) {
               <div><h2 id="registration-heading">Register your RFID card</h2><p>Enter your student details to request a new wallet account.</p></div>
               <button className="recharge-text-button" type="button" onClick={returnToLookup}>Back</button>
             </div>
-            <form className="recharge-lookup-form" onSubmit={submitRegistration}>
+            <form className="recharge-lookup-form" onSubmit={submitRegistration} aria-busy={isSubmitting}>
               <label htmlFor="student-name">Full name on student ID</label>
               <input id="student-name" name="studentName" value={studentName} onChange={(event) => setStudentName(event.target.value)} autoComplete="name" placeholder="Enter your full name" required />
               <label htmlFor="student-id">University student ID</label>
               <input id="student-id" name="studentId" value={studentId} onChange={(event) => setStudentId(event.target.value)} autoComplete="off" placeholder="Enter your student ID" required />
               <label htmlFor="card-hex">Card HEX code</label>
               <input id="card-hex" name="cardHex" value={cardHex} onChange={(event) => setCardHex(event.target.value)} autoComplete="off" placeholder="Type the HEX printed on your card" required />
-              <p className="recharge-hint">Student verification is required before a new RFID account can be activated.</p>
-              <button className="recharge-primary-button" type="submit">Submit registration <ArrowRight aria-hidden="true" /></button>
+              <p className="recharge-hint">Your request stays pending until a device maintainer verifies your student details.</p>
+              <button className="recharge-primary-button" type="submit" disabled={isSubmitting}>{isSubmitting ? "Saving request…" : "Submit registration"} <ArrowRight aria-hidden="true" /></button>
             </form>
-            {registrationSubmitted && <div className="recharge-inline-status" role="status"><CircleAlert aria-hidden="true" /><p><strong>Registration is not available yet.</strong><span>No details were sent or saved. Please contact your device maintainer to register your card.</span></p></div>}
+            {registrationStatus && (
+              <div className={`recharge-inline-status ${registrationStatus === "saved" ? "recharge-inline-status-success" : ""}`} role="status">
+                {registrationStatus === "saved" ? <CheckCircle2 aria-hidden="true" /> : <CircleAlert aria-hidden="true" />}
+                <p>
+                  <strong>{registrationStatus === "saved" ? "Registration request saved." : registrationStatus === "duplicate" ? "RFID card already registered." : registrationStatus === "invalid" ? "Check your registration details." : "Unable to save your request."}</strong>
+                  <span>{registrationStatus === "saved" ? "Your request is saved and will remain pending until a device maintainer verifies your details." : registrationStatus === "duplicate" ? "This card is already active or has a pending request for this device." : registrationStatus === "invalid" ? "Please check your details and enter the HEX printed on your card." : "We could not save this request right now. Please try again."}</span>
+                </p>
+              </div>
+            )}
           </section>
         )}
 

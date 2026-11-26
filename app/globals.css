@@ -523,7 +523,12 @@ a { color: inherit; text-decoration: none; }
 .kiosk-modal-close { position: absolute; top: 10px; right: 13px; border: 0; background: transparent; color: #686d76; font-size: 25px; }
 .kiosk-empty, .kiosk-wallet-modal > p, .checkout-rfid-modal > p { color: #737983; font-size: 13px; line-height: 1.5; }
 .checkout-rfid-modal > p { margin: 0; font-size: 12px; line-height: 1.5; }
-.rfid-instruction-highlight { display: block; margin-bottom: 7px; padding: 9px 10px; border-radius: 9px; background: #f0f3f0; color: #263f30; font-weight: 750; }
+.checkout-rfid-modal .rfid-subscription-title { margin: 10px 0 14px; color: #737983; font-size: 14px; font-weight: 600; }
+.rfid-instruction-highlight { display: flex; flex-direction: column; gap: 8px; margin-bottom: 9px; padding: 15px 14px; border: 1px solid #cbdccf; border-radius: 12px; background: #eaf2ec; color: #203d2a; }
+.rfid-instruction-highlight p { margin: 0; font-size: 15px; line-height: 1.45; }
+.rfid-instruction-highlight p:first-child { font-size: 17px; font-weight: 750; }
+.rfid-instruction-highlight p + p { padding-top: 8px; border-top: 1px solid #cfddd2; font-weight: 650; }
+.checkout-rfid-modal > .rfid-no-card-help { color: #737983; font-size: 12px; line-height: 1.5; }
 .kiosk-cart-lines { display: flex; flex-direction: column; gap: 12px; }
 .kiosk-cart-line { display: grid; grid-template-columns: 1fr auto auto; align-items: center; gap: 9px; padding: 10px 0; border-bottom: 1px solid #eceef2; font-size: 12px; }
 .kiosk-cart-line small { display: block; margin-top: 4px; color: #858a93; font-size: 10px; }
@@ -657,6 +662,9 @@ a { color: inherit; text-decoration: none; }
 .recharge-inline-status p { margin: 0; font-size: 12px; line-height: 1.45; }
 .recharge-inline-status strong, .recharge-inline-status span { display: block; }
 .recharge-inline-status span { margin-top: 3px; color: #6d6048; }
+.recharge-inline-status-success { border-color: #b9d7c0; background: #edf6ef; color: #244b30; }
+.recharge-inline-status-success > svg { color: #39744a; }
+.recharge-inline-status-success span { color: #496b52; }
 .recharge-payment-note { margin: 13px 0 0; color: #606b60; font-size: 13px; line-height: 1.5; }
 .recharge-payment-card .recharge-primary-button { margin-top: 14px; }
 @media (max-width: 560px) {
